@@ -72,6 +72,47 @@ jobs:
           echo "📧 Testers will receive email notifications"
           echo "🔗 Check Firebase Console for distribution links"
 
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: success()
+        with:
+          files: app/build/outputs/apk/release/app-release.apk
+          name: SUMVILTAD Connect v${{ steps.get_version.outputs.version }}
+          body: |
+            ## 🌾 SUMVILTAD Connect v${{ steps.get_version.outputs.version }}
+
+            **Rice Disease Detection & Farm Management System for Sumviltad Farmers**
+
+            ### 📥 Download & Installation
+
+            1. **Download APK**: Click the `app-release.apk` file below
+            2. **Enable Installation**: Go to Settings → Security → Enable "Install from unknown sources"
+            3. **Install**: Open the downloaded APK and tap "Install"
+            4. **Done**: Launch SUMVILTAD Connect!
+
+            ### 📱 System Requirements
+            - Android 7.0 (Nougat) or higher
+            - Minimum 2GB RAM
+            - 500MB free storage
+            - Internet connection (for weather, notifications, and online features)
+
+            ### 🆕 What's New in v${{ steps.get_version.outputs.version }}
+
+            ${{ github.event.head_commit.message }}
+
+            ### 📊 Build Information
+            - **Build Date**: ${{ github.event.head_commit.timestamp }}
+            - **Build ID**: `${{ github.sha }}`
+            - **Built by**: ${{ github.event.head_commit.author.name }}
+
+            ### 🐛 Found a Bug?
+            Report issues at: https://github.com/${{ github.repository }}/issues
+
+            ### 📞 Support
+            Need help? Contact: [Your Support Email/Phone]
+          draft: false
+          prerelease: false
+
       - name: Upload APK artifact (backup)
         uses: actions/upload-artifact@v4
         if: success()

@@ -13,7 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
-/build
+
+# Build directories (exclude from Git)
+build/
+*/build/
 
 # Sample data and temporary files
 sampledata/

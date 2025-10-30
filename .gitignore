@@ -1,87 +1,26 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-/build
+﻿# Build outputs
+build/
+*/build/
+app/build/
+*.apk
+*.ap_
+*.dex
 
-# Sample data and temporary files
-sampledata/
-
-# Android specific
-*.log
-*.pid
-local.properties
-
-# Dependencies
-node_modules/
-vendor/
-
-# IDE files
-.vscode/
+# IDE
 .idea/
-*.swp
-*.swo
+*.iml
+.gradle/
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Large folders to exclude
+sampledata/
+rice-disease-api/
+**/rice-disease-api/
+app/release/*.apk
 
-# Laravel specific
-/storage/*.key
-/vendor
-.env
-.env.backup
-.phpunit.result.cache
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Capacitor
-.capacitor/
-
-# ML Models and Large Files (prevents GitHub push errors)
-*.pt
-*.pth
-*.onnx
-*.h5
-*.pkl
-*.model
-rice_disease_model_traced.pt
-
-# Python virtual environments
+# Python
 venv/
-env/
-.venv/
-.env/
-__pycache__/
 *.pyc
-*.pyo
-
-# Large binary libraries
-*.dll
-*.lib
-*.so
-*.dylib
-site-packages/torch/
-
-# Temporary and cache files
-*.tmp
-*.temp
-*.cache
-.pytest_cache/
+__pycache__/
+*.pth
+*.pt
+*.onnx

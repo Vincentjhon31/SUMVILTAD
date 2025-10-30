@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120"
+    android:tint="@android:color/holo_green_dark">
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M60,10C32.4,10 10,32.4 10,60s22.4,50 50,50s50,-22.4 50,-50S87.6,10 60,10z"/>
+    <path
+        android:fillColor="@android:color/holo_green_dark"
+        android:pathData="M60,20c-22.1,0 -40,17.9 -40,40s17.9,40 40,40s40,-17.9 40,-40S82.1,20 60,20z"/>
+    <!-- Rice grain shapes -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M45,35l6,0a3,3 0,0 1,3 3l0,8a3,3 0,0 1,-3 3l-6,0a3,3 0,0 1,-3 -3l0,-8a3,3 0,0 1,3 -3z"/>
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M69,35l6,0a3,3 0,0 1,3 3l0,8a3,3 0,0 1,-3 3l-6,0a3,3 0,0 1,-3 -3l0,-8a3,3 0,0 1,3 -3z"/>
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M57,45l6,0a3,3 0,0 1,3 3l0,8a3,3 0,0 1,-3 3l-6,0a3,3 0,0 1,-3 -3l0,-8a3,3 0,0 1,3 -3z"/>
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M45,55l6,0a3,3 0,0 1,3 3l0,8a3,3 0,0 1,-3 3l-6,0a3,3 0,0 1,-3 -3l0,-8a3,3 0,0 1,3 -3z"/>
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M69,55l6,0a3,3 0,0 1,3 3l0,8a3,3 0,0 1,-3 3l-6,0a3,3 0,0 1,-3 -3l0,-8a3,3 0,0 1,3 -3z"/>
+    <!-- Leaf stem -->
+    <path
+        android:fillColor="@android:color/holo_green_light"
+        android:pathData="M58,70l4,0l0,15l-4,0z"/>
+</vector>
+

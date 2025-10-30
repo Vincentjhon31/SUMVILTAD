@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Cloud Messaging Setup Guide</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #FF6B35;
+        }
+        .step {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #FF6B35;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .button {
+            display: inline-block;
+            background: #FF6B35;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .button:hover {
+            background: #e55a2b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firebase Cloud Messaging Setup Guide</h1>
+        <p><strong>Project:</strong> svtc-acd06</p>
+        <p><strong>Status:</strong> Cloud Messaging API (Legacy) is Disabled ❌</p>
+
+        <div class="warning">
+            <strong>⚠️ Action Required:</strong> You need to enable the Cloud Messaging API (Legacy) to get your Server Key.
+        </div>
+
+        <h2>📋 Step-by-Step Instructions</h2>
+
+        <div class="step">
+            <h3>Step 1: Enable Cloud Messaging API (Legacy)</h3>
+            <p>Choose ONE of these methods:</p>
+
+            <h4>Method A: Direct Firebase Console Link</h4>
+            <a href="https://console.firebase.google.com/project/svtc-acd06/settings/cloudmessaging" class="button" target="_blank">
+                Open Cloud Messaging Settings
+            </a>
+            <p>Then look for "Cloud Messaging API (Legacy)" and click "Enable"</p>
+
+            <h4>Method B: Google Cloud Console</h4>
+            <a href="https://console.cloud.google.com/apis/library/fcm.googleapis.com?project=svtc-acd06" class="button" target="_blank">
+                Enable FCM API
+            </a>
+            <p>Click the "ENABLE" button when the page loads</p>
+
+            <h4>Method C: Alternative Cloud API Link</h4>
+            <a href="https://console.cloud.google.com/apis/api/fcm.googleapis.com/overview?project=svtc-acd06" class="button" target="_blank">
+                FCM API Overview
+            </a>
+            <p>Check if the API is enabled, if not, enable it</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Get Your Server Key</h3>
+            <p>After enabling, refresh the Cloud Messaging page and you'll see:</p>
+            <div class="code">
+Cloud Messaging API (Legacy)
+✅ Enabled
+
+Server key: AAAAxxxxxxxxxxxxxxx:APA91bFxxxxxxxxx...
+Sender ID: 62836012915
+            </div>
+            <p><strong>Copy the entire Server key</strong> (it's very long, around 150+ characters)</p>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Add to Your .env File</h3>
+            <p>Open: <code>C:\Users\jhon vincent\AndroidStudioProjects\SumviltadConnect\app\sampledata\.env</code></p>
+            <p>Replace this line:</p>
+            <div class="code">
+FIREBASE_SERVER_KEY=YOUR_SERVER_KEY_HERE
+            </div>
+            <p>With your actual server key:</p>
+            <div class="code">
+FIREBASE_SERVER_KEY=AAAAxxxxxxxxxxxxxxx:APA91bFxxxxxxxxx...
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Clear Laravel Cache</h3>
+            <p>Run these commands:</p>
+            <div class="code">
+cd "C:\Users\jhon vincent\AndroidStudioProjects\SumviltadConnect\app\sampledata"
+php artisan config:clear
+php artisan cache:clear
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Step 5: Test Configuration</h3>
+            <p>Run the test script:</p>
+            <div class="code">
+php test-firebase-key.php
+            </div>
+            <p>You should see:</p>
+            <div class="success">
+                ✅ FIREBASE_SERVER_KEY is configured!<br>
+                ✅ Server key length looks good!
+            </div>
+        </div>
+
+        <h2>🔍 Troubleshooting</h2>
+
+        <div class="warning">
+            <h3>If you get "There was an error while loading" in Google Cloud Console:</h3>
+            <ul>
+                <li>✅ Try opening in <strong>Incognito/Private mode</strong></li>
+                <li>✅ Clear your browser cache and cookies</li>
+                <li>✅ Use Method A (Firebase Console direct link) instead</li>
+                <li>✅ Make sure you're logged in with the correct Google account</li>
+                <li>✅ Try a different browser (Chrome, Firefox, Edge)</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h3>Alternative: Use Firebase Admin SDK (V1 API)</h3>
+            <p>If you can't get the Legacy API working, you can use the modern V1 API instead:</p>
+            <ol>
+                <li>Go to: <a href="https://console.firebase.google.com/project/svtc-acd06/settings/serviceaccounts/adminsdk" target="_blank">Service Accounts</a></li>
+                <li>Click "Generate new private key"</li>
+                <li>Download the JSON file</li>
+                <li>This requires code changes but is more secure</li>
+            </ol>
+            <p><em>Note: This is more complex but is the recommended approach by Firebase</em></p>
+        </div>
+
+        <h2>📞 Need Help?</h2>
+        <p>If you're still having issues:</p>
+        <ol>
+            <li>Check if you're the project owner (Settings → Users and permissions)</li>
+            <li>Verify your Firebase billing is set up (some APIs require it)</li>
+            <li>Try the links above in incognito mode</li>
+            <li>Contact Firebase Support with your Project ID: <strong>svtc-acd06</strong></li>
+        </ol>
+
+        <div class="success">
+            <h3>✅ Success Checklist</h3>
+            <input type="checkbox"> Cloud Messaging API (Legacy) is enabled<br>
+            <input type="checkbox"> Server Key is visible and copied<br>
+            <input type="checkbox"> Added Server Key to .env file<br>
+            <input type="checkbox"> Ran php artisan config:clear<br>
+            <input type="checkbox"> Test script shows key is configured<br>
+            <input type="checkbox"> Ready to test push notifications!
+        </div>
+
+        <hr style="margin: 30px 0;">
+        <p style="text-align: center; color: #666;">
+            <strong>Your Firebase Project:</strong> svtc-acd06<br>
+            <strong>Sender ID:</strong> 62836012915<br>
+            <strong>App Package:</strong> com.zynt.sumviltadconnect
+        </p>
+    </div>
+</body>
+</html>
+

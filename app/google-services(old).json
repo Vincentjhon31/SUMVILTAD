@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "177486339769",
+    "project_id": "sumviltadconnect-bd8b5",
+    "storage_bucket": "sumviltadconnect-bd8b5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:177486339769:android:94f9a16dc4f9fc46f0c568",
+        "android_client_info": {
+          "package_name": "com.zynt.sumviltadconnect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARPfFoyzNwoFXnG_V3oRD_5NQtCdOQeO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

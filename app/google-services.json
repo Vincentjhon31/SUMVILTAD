@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "62836012915",
+    "firebase_url": "https://svtc-acd06-default-rtdb.firebaseio.com",
+    "project_id": "svtc-acd06",
+    "storage_bucket": "svtc-acd06.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:62836012915:android:7cbb2c36441fe4607af706",
+        "android_client_info": {
+          "package_name": "com.zynt.sumviltadconnect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNDv8-AtNmoR5xALMJwLlNfmzOrYCOD88"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

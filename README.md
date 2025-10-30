@@ -11,25 +11,98 @@
 
 ## 📋 Table of Contents
 
-1. [Project Overview](#-project-overview)
-2. [Features](#-features)
-3. [System Architecture](#-system-architecture)
-4. [Screenshots](#-screenshots)
-5. [Technology Stack](#-technology-stack)
-6. [Requirements](#-requirements)
-7. [Installation](#-installation)
-8. [Building from Source](#-building-from-source)
-9. [App Versioning & Releases](#-app-versioning--releases)
-10. [API Documentation](#-api-documentation)
-11. [Machine Learning Integration](#-machine-learning-integration)
-12. [Project Structure](#-project-structure)
-13. [Configuration](#-configuration)
-14. [Testing](#-testing)
-15. [Troubleshooting](#-troubleshooting)
-16. [Contributing](#-contributing)
-17. [Future Enhancements](#-future-enhancements)
-18. [License](#-license)
-19. [Contact & Support](#-contact--support)
+1. [Download APK](#-download-apk)
+2. [Project Overview](#-project-overview)
+3. [Features](#-features)
+4. [System Architecture](#-system-architecture)
+5. [Screenshots](#-screenshots)
+6. [Technology Stack](#-technology-stack)
+7. [Requirements](#-requirements)
+8. [Installation](#-installation)
+9. [Building from Source](#-building-from-source)
+10. [App Versioning & Releases](#-app-versioning--releases)
+11. [API Documentation](#-api-documentation)
+12. [Machine Learning Integration](#-machine-learning-integration)
+13. [Project Structure](#-project-structure)
+14. [Configuration](#-configuration)
+15. [Testing](#-testing)
+16. [Troubleshooting](#-troubleshooting)
+17. [Contributing](#-contributing)
+18. [Future Enhancements](#-future-enhancements)
+19. [License](#-license)
+20. [Contact & Support](#-contact--support)
+
+---
+
+## 📥 Download APK
+
+### Latest Release: v1.0.0 (October 30, 2025)
+
+Get SUMVILTAD Connect on your Android device:
+
+#### 🔥 Firebase App Distribution (Recommended)
+
+**For Testers & Early Adopters:**
+
+1. **Get Invited**: Contact us to be added as a tester
+2. **Receive Email**: You'll get an invitation to test SUMVILTAD Connect
+3. **Install App Tester**: Download [Firebase App Tester](https://play.google.com/store/apps/details?id=com.google.firebase.apptesters) from Play Store
+4. **Sign In**: Use the same email you were invited with
+5. **Download & Install**: Find SUMVILTAD Connect and tap "Download"
+
+**Benefits:**
+
+- ✅ Automatic updates - Get notified when new versions are available
+- ✅ One-click installation - No need to manually download APK
+- ✅ Version history - Access previous versions if needed
+- ✅ Crash reporting - Help us improve the app
+
+**Want to become a tester?** [Request Beta Access](#-contact--support)
+
+---
+
+#### 📦 Alternative Download Options
+
+**Direct APK Download** (For advanced users):
+
+> ⚠️ **Note**: The APK file is approximately 205MB. Make sure you have sufficient storage and a stable internet connection.
+
+- [Download from Google Drive](#) _(Coming Soon)_
+- [Download from GitHub Releases](https://github.com/Vincentjhon31/SUMVILTAD/releases)
+
+---
+
+### Installation Instructions
+
+#### For Firebase App Tester (Easy):
+
+1. Install Firebase App Tester from Play Store
+2. Sign in with your invited email
+3. Tap on SUMVILTAD Connect
+4. Tap "Download" and "Install"
+5. Open the app and enjoy!
+
+#### For Direct APK (Manual):
+
+1. **Download** the APK file
+2. **Enable Unknown Sources**:
+   - Go to **Settings** > **Security** or **Privacy**
+   - Enable **"Install from Unknown Sources"** or **"Install Unknown Apps"**
+   - Allow your browser or file manager to install apps
+3. **Locate** the downloaded APK file
+4. **Tap** on the file to start installation
+5. **Tap "Install"** and wait for completion
+6. **Open** the app and grant necessary permissions
+
+---
+
+### System Requirements
+
+- **Android Version**: 7.0 (Nougat) or higher (API level 24+)
+- **Storage**: Minimum 500MB free space
+- **RAM**: 2GB or more (recommended: 4GB+)
+- **Camera**: Required for disease detection feature
+- **Internet**: Required for online features (offline disease detection available)
 
 ---
 

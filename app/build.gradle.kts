@@ -40,6 +40,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Use debug signing config for testing/Firebase distribution
+            // For Play Store, create a proper release signing config
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {

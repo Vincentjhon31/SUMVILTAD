@@ -17,8 +17,8 @@ android {
         // App Versioning - Follow Semantic Versioning (MAJOR.MINOR.PATCH)
         // versionCode must be incremented for each release to Play Store/GitHub
         // versionName is the user-visible version string
-        versionCode = 1           // Increment by 1 for each release
-        versionName = "1.0.0"     // Update following SemVer: MAJOR.MINOR.PATCH
+        versionCode = 2           // Increment by 1 for each release
+        versionName = "1.0.1"     // Update following SemVer: MAJOR.MINOR.PATCH
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

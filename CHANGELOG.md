@@ -17,6 +17,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.1] - 2025-11-11
+
+### ✨ Added
+
+- **Update Checker Feature**: Automatic GitHub release detection
+  - Check for app updates directly from Profile screen
+  - Visual update banner when new version is available
+  - Direct download link to latest APK
+  - Release notes display in update dialog
+  - Semantic versioning comparison (MAJOR.MINOR.PATCH)
+- **Enhanced Profile Screen**:
+
+  - About dialog with app information, mission, and goals
+  - Help & Support dialog with contact info and quick help topics
+  - GitHub repository link integration
+  - Check for Updates menu item with real-time status
+
+- **Documentation**:
+  - Comprehensive UPDATE_CHECKER_FEATURE.md
+  - Step-by-step RELEASE_GUIDE.md
+  - Updated CHANGELOG.md for version tracking
+
+### 🔧 Improved
+
+- Profile screen UI with better organization
+- Dialog components with Material Design 3
+- Update state management with proper error handling
+- Network timeout configuration for GitHub API
+
+### 🐛 Fixed
+
+- About section now displays content properly
+- Help & Support section fully functional
+- Profile menu items properly clickable
+
+### 📦 Technical Changes
+
+- Added `GitHubRelease` data models
+- Created `GitHubApiService` for API communication
+- Implemented `UpdateRepository` for version checking
+- Added `UpdateViewModel` for state management
+- Version comparison logic using semantic versioning
+
+---
+
 ## [1.0.0] - 2025-10-30
 
 ### 🎉 Initial Release

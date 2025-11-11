@@ -233,4 +233,28 @@ class CropHealthViewModel : ViewModel() {
             }
         }
     }
+
+    /**
+     * Get a specific record by ID from the loaded records
+     */
+    fun getRecordById(id: Int): CropHealthRecord? {
+        // First check in loaded records
+        val fromLoaded = allLoadedRecords.find { it.id == id }
+        if (fromLoaded != null) {
+            return fromLoaded
+        }
+
+        // If using client-side pagination, check all available records
+        if (usingClientSidePagination) {
+            return allAvailableRecords.find { it.id == id }
+        }
+
+        // For server-side pagination, check current state
+        val currentState = _state.value
+        if (currentState is CropHealthUiState.Success) {
+            return currentState.data.find { it.id == id }
+        }
+
+        return null
+    }
 }

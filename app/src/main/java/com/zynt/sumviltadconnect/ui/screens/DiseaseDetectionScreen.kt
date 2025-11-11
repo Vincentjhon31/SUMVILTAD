@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -36,7 +35,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.zynt.sumviltadconnect.ui.viewmodel.DiseaseDetectionViewModel
-import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -55,17 +53,9 @@ fun DiseaseDetectionScreen(
     val detectionResult by viewModel.detectionResult.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
-
-    // Camera launcher
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            selectedImageUri?.let { uri ->
-                viewModel.uploadImage(context, uri)
-            }
-        }
-    }
+    
+    // Camera screen state
+    var showCameraScreen by remember { mutableStateOf(false) }
 
     // Gallery launcher
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -76,18 +66,18 @@ fun DiseaseDetectionScreen(
             viewModel.uploadImage(context, it)
         }
     }
-
-    // Create temp file for camera
-    val tempImageFile = remember {
-        File.createTempFile("rice_image_", ".jpg", context.cacheDir)
-    }
-
-    val tempImageUri = remember {
-        FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.provider",
-            tempImageFile
+    
+    // Show camera screen if requested
+    if (showCameraScreen && cameraPermissionState.status.isGranted) {
+        CameraScreen(
+            onImageCaptured = { uri ->
+                viewModel.setSelectedImage(uri)
+                viewModel.uploadImage(context, uri)
+                showCameraScreen = false
+            },
+            onBack = { showCameraScreen = false }
         )
+        return
     }
 
     Column(
@@ -213,8 +203,7 @@ fun DiseaseDetectionScreen(
                         Button(
                             onClick = {
                                 if (cameraPermissionState.status.isGranted) {
-                                    viewModel.setSelectedImage(tempImageUri)
-                                    cameraLauncher.launch(tempImageUri)
+                                    showCameraScreen = true
                                 } else {
                                     cameraPermissionState.launchPermissionRequest()
                                 }

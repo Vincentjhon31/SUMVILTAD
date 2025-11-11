@@ -28,11 +28,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.zynt.sumviltadconnect.R
 import com.zynt.sumviltadconnect.ui.viewmodel.AuthViewModel
+import com.zynt.sumviltadconnect.ui.viewmodel.CropHealthViewModel
 import kotlinx.coroutines.launch
 import androidx.navigation.NavBackStackEntry
 import androidx.core.content.ContextCompat
@@ -96,6 +99,9 @@ fun FarmerHomeScreen(rootNav: NavController, authViewModel: AuthViewModel) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val context = LocalContext.current
+    
+    // Create a shared ViewModel for CropHealth screens
+    val cropHealthViewModel: CropHealthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 
     val bottomItems = listOf(
         HomeItem.Dashboard,
@@ -188,7 +194,39 @@ fun FarmerHomeScreen(rootNav: NavController, authViewModel: AuthViewModel) {
                 popExitTransition = popExit
             ) {
                 composable("dashboard") { DashboardScreen(rootNav) }
-                composable("cropHealth") { CropHealthScreen(rootNav) }
+                composable("cropHealth") { CropHealthScreen(nav, cropHealthViewModel) }
+                
+                // Crop Health Detail Screen
+                composable(
+                    route = "crop_health_detail/{recordId}",
+                    arguments = listOf(navArgument("recordId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val recordId = backStackEntry.arguments?.getInt("recordId") ?: 0
+                    val record = cropHealthViewModel.getRecordById(recordId)
+                    
+                    record?.let {
+                        CropHealthDetailScreen(navController = nav, record = it, viewModel = cropHealthViewModel)
+                    } ?: run {
+                        // Handle case where record is not found
+                        LaunchedEffect(Unit) {
+                            nav.popBackStack()
+                        }
+                    }
+                }
+                
+                // Crop Health Comments Screen
+                composable(
+                    route = "crop_health_comments/{recordId}",
+                    arguments = listOf(navArgument("recordId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val recordId = backStackEntry.arguments?.getInt("recordId") ?: 0
+                    // TODO: Create CropHealthCommentsScreen or use existing comments dialog
+                    // For now, navigating back
+                    LaunchedEffect(Unit) {
+                        nav.popBackStack()
+                    }
+                }
+                
                 composable("irrigation") { IrrigationScheduleScreen() }
                 composable("tasks") { TasksScreen() }
                 composable("events") { EventsScreen(nav) }

@@ -19,8 +19,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.zynt.sumviltadconnect.BuildConfig
 import com.zynt.sumviltadconnect.ui.viewmodel.AuthViewModel
 import com.zynt.sumviltadconnect.ui.viewmodel.SettingsViewModel
+import com.zynt.sumviltadconnect.ui.viewmodel.UpdateViewModel
+import com.zynt.sumviltadconnect.ui.viewmodel.UpdateState
 import com.zynt.sumviltadconnect.utils.TokenManager
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,12 +31,15 @@ import com.zynt.sumviltadconnect.utils.TokenManager
 fun ProfileScreen(
     navController: NavController,
     authViewModel: AuthViewModel,
-    settingsViewModel: SettingsViewModel = viewModel()
+    settingsViewModel: SettingsViewModel = viewModel(),
+    updateViewModel: UpdateViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showSettingsSection by remember { mutableStateOf(false) }
+    var showAboutDialog by remember { mutableStateOf(false) }
+    var showHelpDialog by remember { mutableStateOf(false) }
 
     val isLoading by authViewModel.isLoading.collectAsState()
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
@@ -42,6 +48,9 @@ fun ProfileScreen(
     val theme by settingsViewModel.theme.collectAsState()
     val notificationsEnabled by settingsViewModel.notificationsEnabled.collectAsState()
     val currentTheme = theme ?: "light"
+
+    // Update state
+    val updateState by updateViewModel.updateState.collectAsState()
 
     // Navigate to login if logged out
     LaunchedEffect(isLoggedIn) {
@@ -75,6 +84,56 @@ fun ProfileScreen(
                 .verticalScroll(scrollState)
                 .padding(16.dp)
         ) {
+            // Update Available Banner
+            if (updateState is UpdateState.UpdateAvailable) {
+                val release = (updateState as UpdateState.UpdateAvailable).release
+                val latestVersion = release.tagName.removePrefix("v")
+                
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { /* Dialog will show automatically */ },
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.NewReleases,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "Update Available!",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            Text(
+                                "Version $latestVersion is ready to download",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                        Icon(
+                            Icons.Default.ChevronRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             // Profile Header
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -185,7 +244,7 @@ fun ProfileScreen(
                         icon = Icons.Default.Info,
                         title = "About",
                         subtitle = "Learn about SumviltadConnect",
-                        onClick = { /* TODO: Show about dialog */ }
+                        onClick = { showAboutDialog = true }
                     )
 
                     Divider()
@@ -194,7 +253,46 @@ fun ProfileScreen(
                         icon = Icons.Default.Help,
                         title = "Help & Support",
                         subtitle = "Get help with the app",
-                        onClick = { /* TODO: Open help */ }
+                        onClick = { showHelpDialog = true }
+                    )
+
+                    Divider()
+
+                    ProfileMenuItem(
+                        icon = Icons.Default.SystemUpdate,
+                        title = "Check for Updates",
+                        subtitle = if (updateState is UpdateState.Checking) 
+                            "Checking for updates..." 
+                        else 
+                            "Version ${BuildConfig.VERSION_NAME}",
+                        onClick = { updateViewModel.checkForUpdates() },
+                        trailing = {
+                            when (updateState) {
+                                is UpdateState.Checking -> {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                }
+                                is UpdateState.UpdateAvailable -> {
+                                    Icon(
+                                        Icons.Default.NewReleases,
+                                        contentDescription = "Update available",
+                                        tint = MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
+                                is UpdateState.UpToDate -> {
+                                    Icon(
+                                        Icons.Default.CheckCircle,
+                                        contentDescription = "Up to date",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
+                                else -> null
+                            }
+                        }
                     )
 
                     Divider()
@@ -368,6 +466,434 @@ fun ProfileScreen(
             }
         )
     }
+
+    // About Dialog
+    if (showAboutDialog) {
+        AlertDialog(
+            onDismissRequest = { showAboutDialog = false },
+            title = { 
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        Icons.Default.Info,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        "About SumviltadConnect",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    // About Section
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                "About Us",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "SumviltadConnect is an innovative agricultural technology platform designed to empower Filipino rice farmers. We combine artificial intelligence with traditional farming wisdom to provide instant, accurate disease detection and management solutions directly from your mobile device.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Mission Section
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                "Our Mission",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "To revolutionize rice farming in the Philippines by making advanced disease detection technology accessible to every farmer. We aim to reduce crop losses, increase yields, and support sustainable farming practices through cutting-edge AI technology and community collaboration.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Goals Section
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f)
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                "Our Goals",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            
+                            GoalItem("Provide 95%+ accurate disease detection")
+                            GoalItem("Reach 10,000+ farmers nationwide")
+                            GoalItem("Reduce crop losses by 50%")
+                            GoalItem("Build a thriving farming community")
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Version Info
+                    Text(
+                        "Version 1.0",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showAboutDialog = false }
+                ) {
+                    Text("Close")
+                }
+            }
+        )
+    }
+
+    // Help & Support Dialog
+    if (showHelpDialog) {
+        AlertDialog(
+            onDismissRequest = { showHelpDialog = false },
+            title = { 
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        Icons.Default.Help,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        "Help & Support",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    // Contact Information
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.Email,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        "Email Support",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        "sumviltadconnect@gmail.com",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Quick Help Topics
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                "Quick Help",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            HelpItem(
+                                title = "How to scan rice leaves",
+                                description = "Go to Detection screen, take a clear photo of the rice leaf, and wait for AI analysis."
+                            )
+                            
+                            Spacer(modifier = Modifier.height(8.dp))
+                            
+                            HelpItem(
+                                title = "Understanding results",
+                                description = "The app shows disease name, confidence level, and management recommendations in English and Tagalog."
+                            )
+                            
+                            Spacer(modifier = Modifier.height(8.dp))
+                            
+                            HelpItem(
+                                title = "View detection history",
+                                description = "Access your past detections from Profile > Detection History."
+                            )
+                            
+                            Spacer(modifier = Modifier.height(8.dp))
+                            
+                            HelpItem(
+                                title = "Notifications",
+                                description = "Enable notifications in Settings to receive farming updates and event alerts."
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // GitHub Repository
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f)
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.Code,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.tertiary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        "Open Source",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        "github.com/Vincentjhon31/SUMVILTAD",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showHelpDialog = false }
+                ) {
+                    Text("Close")
+                }
+            }
+        )
+    }
+
+    // Update Available Dialog
+    if (updateState is UpdateState.UpdateAvailable) {
+        val release = (updateState as UpdateState.UpdateAvailable).release
+        val latestVersion = release.tagName.removePrefix("v")
+        
+        AlertDialog(
+            onDismissRequest = { updateViewModel.dismissUpdate() },
+            title = { 
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        Icons.Default.NewReleases,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            "Update Available",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "Version $latestVersion",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                "Current Version: ${BuildConfig.VERSION_NAME}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                "Latest Version: $latestVersion",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
+                    if (!release.body.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+                            )
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    "What's New",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    release.body,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Show download size if available
+                    val apkAsset = release.assets.firstOrNull { 
+                        it.name.endsWith(".apk", ignoreCase = true) 
+                    }
+                    
+                    if (apkAsset != null) {
+                        val sizeMB = apkAsset.size / (1024.0 * 1024.0)
+                        Text(
+                            "Download Size: %.2f MB".format(sizeMB),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { 
+                        updateViewModel.downloadApk(context, release)
+                        updateViewModel.dismissUpdate()
+                    }
+                ) {
+                    Icon(
+                        Icons.Default.Download,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Download")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { updateViewModel.dismissUpdate() }
+                ) {
+                    Text("Later")
+                }
+            }
+        )
+    }
+
+    // Update Check Error Snackbar
+    if (updateState is UpdateState.Error) {
+        LaunchedEffect(updateState) {
+            // Auto-dismiss error after 3 seconds
+            kotlinx.coroutines.delay(3000)
+            updateViewModel.resetState()
+        }
+    }
+
+    // Up to Date Snackbar
+    if (updateState is UpdateState.UpToDate) {
+        LaunchedEffect(updateState) {
+            // Auto-dismiss after 2 seconds
+            kotlinx.coroutines.delay(2000)
+            updateViewModel.resetState()
+        }
+    }
 }
 
 @Composable
@@ -469,5 +995,48 @@ private fun SettingsThemeOption(
                 modifier = Modifier.size(20.dp)
             )
         }
+    }
+}
+
+@Composable
+private fun GoalItem(text: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Icon(
+            Icons.Default.Check,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Composable
+private fun HelpItem(title: String, description: String) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            title,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            description,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

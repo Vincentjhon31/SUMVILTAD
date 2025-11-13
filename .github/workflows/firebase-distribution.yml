@@ -66,7 +66,7 @@ jobs:
             2. Find "SUMVILTAD Connect" in your apps list
             3. Tap "Download" then "Install"
 
-            Need help? Contact: [Your Email/Support]
+            Need help? Contact: sumviltadconnect@gmail.com
 
       - name: Print distribution info
         if: success()
@@ -112,7 +112,7 @@ jobs:
             Report issues at: https://github.com/${{ github.repository }}/issues
 
             ### 📞 Support
-            Need help? Contact: [Your Support Email/Phone]
+            Need help? Contact: sumviltadconnect@gmail.com
           draft: false
           prerelease: false
 

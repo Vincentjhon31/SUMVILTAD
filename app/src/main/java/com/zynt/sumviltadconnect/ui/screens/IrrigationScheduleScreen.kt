@@ -3,6 +3,7 @@ package com.zynt.sumviltadconnect.ui.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,8 +51,8 @@ fun IrrigationScheduleScreen(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .padding(AppDimensions.paddingMedium()),
+        verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium()),
         state = rememberLazyListState()
     ) {
         // Header
@@ -81,7 +82,7 @@ fun IrrigationScheduleScreen(
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(AppDimensions.paddingMedium()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
@@ -89,13 +90,13 @@ fun IrrigationScheduleScreen(
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.error
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                         Text(
                             text = currentState.message,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onErrorContainer
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                         Button(
                             onClick = { viewModel.loadIrrigationSchedules() }
                         ) {
@@ -148,26 +149,26 @@ fun IrrigationScheduleScreen(
 private fun IrrigationHeader() {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingExtraSmall())
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(AppDimensions.paddingLarge()),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Filled.WaterDrop,
                 contentDescription = null,
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(AppDimensions.iconSizeLarge()),
                 tint = MaterialTheme.colorScheme.primary
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
             Text(
                 text = "Irrigation Schedule",
                 style = MaterialTheme.typography.headlineSmall,
@@ -192,8 +193,8 @@ private fun NextIrrigationCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingSmall())
     ) {
         Box(
             modifier = Modifier
@@ -201,7 +202,7 @@ private fun NextIrrigationCard(
                 .background(
                     brush = Brush.horizontalGradient(gradientColors)
                 )
-                .padding(20.dp)
+                .padding(AppDimensions.paddingLarge())
         ) {
             Column {
                 Row(
@@ -215,10 +216,10 @@ private fun NextIrrigationCard(
                         Icon(
                             imageVector = if (isToday) Icons.Filled.Warning else Icons.Filled.Info,
                             contentDescription = null,
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(AppDimensions.iconSizeLarge()),
                             tint = Color.White
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
                         Column {
                             Text(
                                 text = if (isToday) "Irrigation Today!" else "Next Irrigation",
@@ -251,16 +252,16 @@ private fun NextIrrigationCard(
                 }
 
                 schedule.notes?.let { notes ->
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
                             containerColor = Color.White.copy(alpha = 0.2f)
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
                     ) {
                         Column(
-                            modifier = Modifier.padding(12.dp)
+                            modifier = Modifier.padding(AppDimensions.paddingMedium())
                         ) {
                             Text(
                                 text = "Note: $notes",
@@ -285,8 +286,8 @@ private fun UpcomingIrrigationSection(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingExtraSmall())
     ) {
         Column {
             // Header
@@ -301,7 +302,7 @@ private fun UpcomingIrrigationSection(
                             )
                         )
                     )
-                    .padding(20.dp)
+                    .padding(AppDimensions.paddingLarge())
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -309,10 +310,10 @@ private fun UpcomingIrrigationSection(
                     Icon(
                         imageVector = Icons.Outlined.DateRange,
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(AppDimensions.iconSizeMedium()),
                         tint = Color(0xFF4CAF50)
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
                     Column {
                         Text(
                             text = "Upcoming Irrigation",
@@ -334,16 +335,16 @@ private fun UpcomingIrrigationSection(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(40.dp),
+                        .padding(AppDimensions.iconSizeLarge()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.DateRange,
                         contentDescription = null,
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(AppDimensions.buttonHeight()),
                         tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
                     Text(
                         text = "No upcoming irrigation scheduled",
                         style = MaterialTheme.typography.bodyLarge,
@@ -351,7 +352,7 @@ private fun UpcomingIrrigationSection(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         textAlign = TextAlign.Center
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                     Text(
                         text = "Check back later or contact your local irrigation manager",
                         style = MaterialTheme.typography.bodySmall,
@@ -361,8 +362,8 @@ private fun UpcomingIrrigationSection(
                 }
             } else {
                 Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier.padding(AppDimensions.paddingLarge()),
+                    verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
                 ) {
                     schedules.forEach { schedule ->
                         IrrigationScheduleItem(
@@ -374,7 +375,7 @@ private fun UpcomingIrrigationSection(
 
                     // Pagination control
                     if (upcomingCurrentPage < upcomingTotalPages - 1) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                         Button(
                             onClick = { viewModel.loadMoreUpcoming() },
                             modifier = Modifier.fillMaxWidth(),
@@ -385,13 +386,13 @@ private fun UpcomingIrrigationSection(
                             Icon(
                                 imageVector = Icons.Outlined.KeyboardArrowDown,
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(AppDimensions.iconSizeSmall())
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                             Text("Load More (${upcomingCurrentPage + 1}/${upcomingTotalPages})")
                         }
                     } else if (upcomingTotalPages > 1) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                         Text(
                             text = "Showing all ${schedules.size} irrigation schedules",
                             style = MaterialTheme.typography.bodySmall,
@@ -416,8 +417,8 @@ private fun PastIrrigationSection(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingExtraSmall())
     ) {
         Column {
             // Header
@@ -432,7 +433,7 @@ private fun PastIrrigationSection(
                             )
                         )
                     )
-                    .padding(20.dp)
+                    .padding(AppDimensions.paddingLarge())
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -440,10 +441,10 @@ private fun PastIrrigationSection(
                     Icon(
                         imageVector = Icons.Outlined.History,
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(AppDimensions.iconSizeMedium()),
                         tint = Color(0xFF607D8B)
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
                     Column {
                         Text(
                             text = "Irrigation History",
@@ -462,8 +463,8 @@ private fun PastIrrigationSection(
 
             // Content
             Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier.padding(AppDimensions.paddingLarge()),
+                verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
             ) {
                 schedules.forEach { schedule ->
                     IrrigationScheduleItem(
@@ -475,7 +476,7 @@ private fun PastIrrigationSection(
 
                 // Pagination control
                 if (pastCurrentPage < pastTotalPages - 1) {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                     Button(
                         onClick = { viewModel.loadMorePast() },
                         modifier = Modifier.fillMaxWidth(),
@@ -486,13 +487,13 @@ private fun PastIrrigationSection(
                         Icon(
                             imageVector = Icons.Outlined.KeyboardArrowDown,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(AppDimensions.iconSizeSmall())
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                         Text("Load More (${pastCurrentPage + 1}/${pastTotalPages})")
                     }
                 } else if (pastTotalPages > 1) {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                     Text(
                         text = "Showing all ${schedules.size} past irrigation records",
                         style = MaterialTheme.typography.bodySmall,
@@ -516,7 +517,7 @@ private fun IrrigationScheduleItem(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
         colors = CardDefaults.cardColors(
             containerColor = if (isToday) {
                 MaterialTheme.colorScheme.tertiaryContainer
@@ -524,10 +525,10 @@ private fun IrrigationScheduleItem(
                 MaterialTheme.colorScheme.surfaceVariant
             }
         ),
-        border = if (isToday) BorderStroke(1.dp, Color(0xFFFF9800)) else null
+        border = if (isToday) BorderStroke(AppDimensions.paddingExtraSmall(), Color(0xFFFF9800)) else null
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(AppDimensions.paddingMedium())
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -538,7 +539,7 @@ private fun IrrigationScheduleItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Card(
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(AppDimensions.paddingSmall()),
                         colors = CardDefaults.cardColors(
                             containerColor = if (isUpcoming) Color(0xFF2196F3).copy(alpha = 0.1f) else Color(0xFF607D8B).copy(alpha = 0.1f)
                         )
@@ -547,12 +548,12 @@ private fun IrrigationScheduleItem(
                             imageVector = Icons.Filled.WaterDrop,
                             contentDescription = null,
                             modifier = Modifier
-                                .size(40.dp)
-                                .padding(8.dp),
+                                .size(AppDimensions.iconSizeLarge())
+                                .padding(AppDimensions.paddingSmall()),
                             tint = if (isUpcoming) Color(0xFF2196F3) else Color(0xFF607D8B)
                         )
                     }
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
                     Column {
                         Text(
                             text = viewModel.formatDate(schedule.date),
@@ -566,10 +567,10 @@ private fun IrrigationScheduleItem(
                             Icon(
                                 imageVector = Icons.Outlined.LocationOn,
                                 contentDescription = null,
-                                modifier = Modifier.size(16.dp),
+                                modifier = Modifier.size(AppDimensions.paddingMedium()),
                                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                            Spacer(modifier = Modifier.width(AppDimensions.paddingExtraSmall()))
                             Text(
                                 text = schedule.location,
                                 style = MaterialTheme.typography.bodyMedium,
@@ -592,19 +593,19 @@ private fun IrrigationScheduleItem(
             }
 
             schedule.notes?.let { notes ->
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
                     ),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(AppDimensions.paddingSmall())
                 ) {
                     Text(
                         text = "Note: $notes",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(AppDimensions.paddingSmall())
                     )
                 }
             }
@@ -633,22 +634,22 @@ private fun StatusBadge(
     }
 
     Card(
-        shape = RoundedCornerShape(6.dp),
+        shape = RoundedCornerShape(AppDimensions.paddingExtraSmall()),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        border = BorderStroke(1.dp, textColor.copy(alpha = 0.3f))
+        border = BorderStroke(AppDimensions.paddingExtraSmall(), textColor.copy(alpha = 0.3f))
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingExtraSmall()),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (isToday) {
                 Icon(
                     imageVector = Icons.Filled.AccessTime,
                     contentDescription = null,
-                    modifier = Modifier.size(12.dp),
+                    modifier = Modifier.size(AppDimensions.paddingMedium()),
                     tint = textColor
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(AppDimensions.paddingExtraSmall()))
             }
             Text(
                 text = text,
@@ -664,23 +665,23 @@ private fun StatusBadge(
 private fun InfoCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+        border = BorderStroke(AppDimensions.paddingExtraSmall(), MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
     ) {
         Row(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(AppDimensions.paddingLarge()),
             verticalAlignment = Alignment.Top
         ) {
             Icon(
                 imageVector = Icons.Outlined.Info,
                 contentDescription = null,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(AppDimensions.iconSizeMedium()),
                 tint = MaterialTheme.colorScheme.primary
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
             Column {
                 Text(
                     text = "Important Information",
@@ -688,9 +689,9 @@ private fun InfoCard() {
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingExtraSmall())
                 ) {
                     InfoPoint("Irrigation schedules are managed by your local agricultural office")
                     InfoPoint("Please prepare your fields according to the scheduled dates")

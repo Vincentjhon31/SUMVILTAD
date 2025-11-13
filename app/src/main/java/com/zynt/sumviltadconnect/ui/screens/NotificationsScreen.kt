@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -48,7 +49,7 @@ fun NotificationsScreen(vm: NotificationsViewModel = viewModel()) {
             title = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingSmall())
                 ) {
                     Text(
                         "Notifications",
@@ -119,7 +120,7 @@ fun NotificationsScreen(vm: NotificationsViewModel = viewModel()) {
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
                     ) {
                         CircularProgressIndicator(
                             color = MaterialTheme.colorScheme.primary
@@ -140,13 +141,13 @@ fun NotificationsScreen(vm: NotificationsViewModel = viewModel()) {
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
                     ) {
                         Icon(
                             Icons.Default.ErrorOutline,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(AppDimensions.buttonHeight())
                         )
                         Text(
                             "Error loading notifications",
@@ -165,7 +166,7 @@ fun NotificationsScreen(vm: NotificationsViewModel = viewModel()) {
                             )
                         ) {
                             Icon(Icons.Default.Refresh, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                             Text("Try Again")
                         }
                     }
@@ -191,7 +192,7 @@ fun NotificationsScreen(vm: NotificationsViewModel = viewModel()) {
                             color = MaterialTheme.colorScheme.secondaryContainer
                         ) {
                             Row(
-                                modifier = Modifier.padding(8.dp),
+                                modifier = Modifier.padding(AppDimensions.paddingSmall()),
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -199,9 +200,9 @@ fun NotificationsScreen(vm: NotificationsViewModel = viewModel()) {
                                     Icons.Default.CloudOff,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(AppDimensions.paddingMedium())
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                                 Text(
                                     "Showing cached notifications",
                                     style = MaterialTheme.typography.bodySmall,
@@ -213,8 +214,8 @@ fun NotificationsScreen(vm: NotificationsViewModel = viewModel()) {
 
                     // Filter Chips
                     LazyRow(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium(), vertical = AppDimensions.paddingSmall()),
+                        horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingSmall())
                     ) {
                         val filters = listOf(
                             "all" to "All",
@@ -251,13 +252,13 @@ fun NotificationsScreen(vm: NotificationsViewModel = viewModel()) {
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                                verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
                             ) {
                                 Icon(
                                     Icons.Default.NotificationsNone,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.outline,
-                                    modifier = Modifier.size(64.dp)
+                                    modifier = Modifier.size(AppDimensions.fabSize())
                                 )
                                 Text(
                                     "No notifications",
@@ -278,8 +279,8 @@ fun NotificationsScreen(vm: NotificationsViewModel = viewModel()) {
                         // Notifications List
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            contentPadding = PaddingValues(AppDimensions.paddingMedium()),
+                            verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
                         ) {
                             items(filteredData) { notification ->
                                 NotificationCard(
@@ -309,28 +310,25 @@ fun NotificationCard(
             .fillMaxWidth()
             .animateContentSize()
             .clickable { isExpanded = !isExpanded },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
         colors = CardDefaults.cardColors(
-            containerColor = if (notification.isUnread) {
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = if (notification.isUnread) 4.dp else 2.dp
-        )
+            defaultElevation = AppDimensions.paddingExtraSmall()
+        ),
+        border = null
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(AppDimensions.paddingMedium())
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
         ) {
             // Notification Type Icon (matching Laravel web design)
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(AppDimensions.iconSizeLarge())
                     .clip(CircleShape)
                     .background(
                         when (notification.type) {
@@ -356,14 +354,14 @@ fun NotificationCard(
                         "error" -> Color(0xFFEF4444)
                         else -> Color(0xFF3B82F6)
                     },
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(AppDimensions.iconSizeSmall())
                 )
             }
 
             // Content
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingExtraSmall())
             ) {
                 // Header Row
                 Row(
@@ -373,7 +371,7 @@ fun NotificationCard(
                 ) {
                     Column(
                         modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingExtraSmall())
                     ) {
                         // Title
                         Text(
@@ -398,7 +396,7 @@ fun NotificationCard(
                     if (notification.isUnread) {
                         Box(
                             modifier = Modifier
-                                .size(8.dp)
+                                .size(AppDimensions.paddingSmall())
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.primary)
                         )
@@ -420,20 +418,20 @@ fun NotificationCard(
 
                     // Action buttons
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingExtraSmall())
                     ) {
                         if (notification.isUnread) {
                             FilledTonalButton(
                                 onClick = { onMarkRead(notification) },
-                                modifier = Modifier.height(32.dp),
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                modifier = Modifier.height(AppDimensions.paddingExtraLarge()),
+                                contentPadding = PaddingValues(horizontal = AppDimensions.paddingMedium(), vertical = AppDimensions.paddingExtraSmall())
                             ) {
                                 Icon(
                                     Icons.Default.Done,
                                     contentDescription = "Mark as read",
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(AppDimensions.paddingMedium())
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
+                                Spacer(modifier = Modifier.width(AppDimensions.paddingExtraSmall()))
                                 Text(
                                     "Mark read",
                                     style = MaterialTheme.typography.labelSmall
@@ -442,15 +440,15 @@ fun NotificationCard(
                         } else {
                             OutlinedButton(
                                 onClick = { onMarkUnread(notification) },
-                                modifier = Modifier.height(32.dp),
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                modifier = Modifier.height(AppDimensions.paddingExtraLarge()),
+                                contentPadding = PaddingValues(horizontal = AppDimensions.paddingMedium(), vertical = AppDimensions.paddingExtraSmall())
                             ) {
                                 Icon(
                                     Icons.Default.MarkEmailUnread,
                                     contentDescription = "Mark as unread",
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(AppDimensions.paddingMedium())
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
+                                Spacer(modifier = Modifier.width(AppDimensions.paddingExtraSmall()))
                                 Text(
                                     "Mark unread",
                                     style = MaterialTheme.typography.labelSmall
@@ -469,8 +467,8 @@ fun NotificationCard(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .padding(top = AppDimensions.paddingSmall()),
+                        verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingSmall())
                     ) {
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
@@ -479,19 +477,19 @@ fun NotificationCard(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Column(verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingExtraSmall())) {
                                 Text(
                                     "Type",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Row(
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingExtraSmall()),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            .size(8.dp)
+                                            .size(AppDimensions.paddingSmall())
                                             .clip(CircleShape)
                                             .background(
                                                 when (notification.type) {
@@ -511,7 +509,7 @@ fun NotificationCard(
                             }
 
                             Column(
-                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingExtraSmall()),
                                 horizontalAlignment = Alignment.End
                             ) {
                                 Text(
@@ -520,7 +518,7 @@ fun NotificationCard(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Surface(
-                                    shape = RoundedCornerShape(12.dp),
+                                    shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
                                     color = if (notification.isRead) {
                                         MaterialTheme.colorScheme.secondaryContainer
                                     } else {
@@ -529,7 +527,7 @@ fun NotificationCard(
                                 ) {
                                     Text(
                                         if (notification.isRead) "Read" else "Unread",
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                        modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingExtraSmall()),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = if (notification.isRead) {
                                             MaterialTheme.colorScheme.onSecondaryContainer
@@ -558,9 +556,9 @@ fun NotificationCard(
                                 Icon(
                                     Icons.AutoMirrored.Filled.OpenInNew,
                                     contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(AppDimensions.paddingMedium())
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                                 Text("View Details")
                             }
                         }

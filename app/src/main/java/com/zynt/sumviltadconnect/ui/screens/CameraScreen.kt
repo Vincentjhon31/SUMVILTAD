@@ -33,6 +33,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executor
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,7 +110,7 @@ fun CameraScreen(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp)
+                .padding(AppDimensions.paddingExtraLarge())
         ) {
             val squareSize = size.minDimension * 0.8f
             val left = (size.width - squareSize) / 2f
@@ -234,7 +235,7 @@ fun CameraScreen(
                 .background(
                     Color.Black.copy(alpha = 0.5f)
                 )
-                .padding(16.dp)
+                .padding(AppDimensions.paddingMedium())
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -286,34 +287,34 @@ fun CameraScreen(
                 }
             }
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
             
             // Instructions
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
                 colors = CardDefaults.cardColors(
                     containerColor = Color(0xFF4CAF50).copy(alpha = 0.95f)
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingExtraSmall())
             ) {
                 Row(
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier.padding(AppDimensions.paddingMedium()),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         Icons.Default.Info,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(AppDimensions.iconSizeSmall())
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                     Text(
                         text = "Position the rice leaf inside the frame for best results",
                         color = Color.White,
-                        fontSize = 13.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
-                        lineHeight = 18.sp
+                        lineHeight = 16.sp
                     )
                 }
             }
@@ -325,7 +326,7 @@ fun CameraScreen(
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
                 .background(Color.Black.copy(alpha = 0.5f))
-                .padding(24.dp),
+                .padding(AppDimensions.paddingLarge()),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -338,7 +339,7 @@ fun CameraScreen(
                         CameraSelector.LENS_FACING_BACK
                     }
                 },
-                modifier = Modifier.size(56.dp),
+                modifier = Modifier.size(AppDimensions.buttonHeight()),
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = Color.White.copy(alpha = 0.2f)
                 ),
@@ -348,22 +349,22 @@ fun CameraScreen(
                     Icons.Default.FlipCameraAndroid,
                     contentDescription = "Flip Camera",
                     tint = Color.White,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(AppDimensions.iconSizeMedium())
                 )
             }
             
             // Capture Button
             Box(
-                modifier = Modifier.size(72.dp),
+                modifier = Modifier.size(AppDimensions.fabSize()),
                 contentAlignment = Alignment.Center
             ) {
                 if (isCapturing) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(8.dp),
-                        color = Color(0xFF4CAF50),
-                        strokeWidth = 4.dp
+                            .padding(AppDimensions.paddingSmall()),
+                        color = Color.White,
+                        strokeWidth = AppDimensions.paddingExtraSmall()
                     )
                 } else {
                     // Outer ring
@@ -389,7 +390,7 @@ fun CameraScreen(
                                     }
                                 }
                             },
-                            modifier = Modifier.size(60.dp),
+                            modifier = Modifier.size(AppDimensions.fabSize()),
                             colors = IconButtonDefaults.iconButtonColors(
                                 containerColor = Color.White
                             ),
@@ -399,7 +400,7 @@ fun CameraScreen(
                                 Icons.Default.CameraAlt,
                                 contentDescription = "Capture",
                                 tint = Color(0xFF4CAF50),
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(AppDimensions.iconSizeLarge())
                             )
                         }
                     }
@@ -409,7 +410,7 @@ fun CameraScreen(
             // Grid Toggle - Now functional
             IconButton(
                 onClick = { showGrid = !showGrid },
-                modifier = Modifier.size(56.dp),
+                modifier = Modifier.size(AppDimensions.buttonHeight()),
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = if (showGrid) {
                         Color(0xFF4CAF50).copy(alpha = 0.5f)
@@ -423,7 +424,7 @@ fun CameraScreen(
                     if (showGrid) Icons.Default.GridOn else Icons.Default.GridOff,
                     contentDescription = "Toggle Grid",
                     tint = Color.White,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(AppDimensions.iconSizeMedium())
                 )
             }
         }

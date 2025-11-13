@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
@@ -108,9 +109,9 @@ private fun HeaderSection(query: String, onQueryChange: (String) -> Unit, refres
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = RoundedCornerShape(20.dp)
+            .padding(AppDimensions.paddingMedium()),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusLarge())
     ) {
         Box(
             Modifier
@@ -247,7 +248,7 @@ private fun ErrorState(message: String, onRetry: () -> Unit) {
 
 @Composable
 private fun TaskList(tasks: List<com.zynt.sumviltadconnect.data.model.Task>, onToggle: (Int) -> Unit, vm: TasksViewModel) {
-    LazyColumn(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().padding(horizontal = AppDimensions.paddingSmall())) {
         items(tasks, key = { it.id }) { task ->
             AnimatedTaskItem(task = task, onToggle = { onToggle(task.id) }, vm = vm)
         }

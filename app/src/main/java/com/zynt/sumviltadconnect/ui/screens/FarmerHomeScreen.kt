@@ -39,6 +39,7 @@ import com.zynt.sumviltadconnect.ui.viewmodel.CropHealthViewModel
 import kotlinx.coroutines.launch
 import androidx.navigation.NavBackStackEntry
 import androidx.core.content.ContextCompat
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 
 // Helper function to safely load app icon
 @Composable
@@ -251,13 +252,13 @@ private fun EnhancedDrawerContent(
     onLogout: () -> Unit
 ) {
     ModalDrawerSheet(
-        modifier = Modifier.width(280.dp)
+        modifier = Modifier.width(AppDimensions.drawerWidth())
     ) {
         // Header with gradient - Using custom app icon
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(AppDimensions.drawerHeaderHeight())
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
@@ -266,13 +267,13 @@ private fun EnhancedDrawerContent(
                         )
                     )
                 )
-                .padding(24.dp),
+                .padding(AppDimensions.paddingLarge()),
             contentAlignment = Alignment.CenterStart
         ) {
             Column {
                 Box(
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(AppDimensions.drawerLogoSize())
                         .background(
                             Color.White.copy(alpha = 0.2f),
                             CircleShape
@@ -282,11 +283,13 @@ private fun EnhancedDrawerContent(
                 ) {
                     // Using Image instead of Icon to support adaptive icons
                     AppIcon(
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier
+                            .size(AppDimensions.logoSizeSmall())
+                            .clip(CircleShape)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
                 Text(
                     text = "SumviltadConnect",
@@ -302,7 +305,7 @@ private fun EnhancedDrawerContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
         // Navigation items
         items.forEach { item ->
@@ -311,7 +314,7 @@ private fun EnhancedDrawerContent(
                     Icon(
                         item.icon,
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
                     )
                 },
                 label = {
@@ -323,8 +326,8 @@ private fun EnhancedDrawerContent(
                 },
                 selected = false,
                 onClick = { onSelect(item) },
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                shape = RoundedCornerShape(12.dp)
+                modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingExtraSmall()),
+                shape = RoundedCornerShape(AppDimensions.cornerRadiusSmall())
             )
         }
 
@@ -348,11 +351,11 @@ private fun EnhancedDrawerContent(
             },
             selected = false,
             onClick = onLogout,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            shape = RoundedCornerShape(12.dp)
+            modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingSmall()),
+            shape = RoundedCornerShape(AppDimensions.cornerRadiusSmall())
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
     }
 }
 
@@ -371,28 +374,28 @@ private fun EnhancedTopAppBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp)
-                .padding(horizontal = 8.dp, vertical = 8.dp),
+                .height(AppDimensions.topAppBarHeight())
+                .padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingSmall()),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // Left side: Menu button
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(AppDimensions.buttonHeight())
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
                 IconButton(
                     onClick = onMenuClick,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(AppDimensions.buttonHeight())
                 ) {
                     Icon(
                         Icons.Default.Menu,
                         contentDescription = "Menu",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(26.dp)
+                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
                     )
                 }
             }
@@ -405,18 +408,18 @@ private fun EnhancedTopAppBar(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(AppDimensions.logoSizeSmall())
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)),
                     contentAlignment = Alignment.Center
                 ) {
                     AppIcon(
                         modifier = Modifier
-                            .size(32.dp)
+                            .size(AppDimensions.iconSizeLarge())
                             .clip(CircleShape)
                     )
                 }
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                 Text(
                     "SumviltadConnect",
                     fontWeight = FontWeight.Bold,
@@ -430,20 +433,20 @@ private fun EnhancedTopAppBar(
             // Right side: Profile button
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(AppDimensions.buttonHeight())
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
                 IconButton(
                     onClick = onProfileClick,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(AppDimensions.buttonHeight())
                 ) {
                     Icon(
                         Icons.Default.Person,
                         contentDescription = "Profile",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(26.dp)
+                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
                     )
                 }
             }
@@ -471,7 +474,7 @@ private fun EnhancedFAB(onClick: () -> Unit) {
         },
         modifier = Modifier
             .scale(scale)
-            .size(64.dp),
+            .size(AppDimensions.fabSize()),
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = Color.White,
         elevation = FloatingActionButtonDefaults.elevation(
@@ -485,7 +488,7 @@ private fun EnhancedFAB(onClick: () -> Unit) {
             Icon(
                 Icons.Default.BugReport,
                 contentDescription = "Detect Disease",
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(AppDimensions.iconSizeMedium())
             )
             Text(
                 "Detect",
@@ -533,14 +536,14 @@ private fun EnhancedBottomNavigation(
                                     item.icon,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(AppDimensions.iconSizeSmall())
                                 )
                             }
                         } else {
                             Icon(
                                 item.icon,
                                 contentDescription = null,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(AppDimensions.iconSizeMedium())
                             )
                         }
                     }

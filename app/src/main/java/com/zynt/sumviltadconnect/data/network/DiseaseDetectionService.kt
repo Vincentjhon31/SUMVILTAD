@@ -215,20 +215,46 @@ class DiseaseDetectionService(private val context: Context) {
                 )
             }
             502, 503, 504 -> {
-                // Server error
-                DiseaseDetectionResponse(
-                    is_rice_leaf = false,
-                    disease = null,
-                    confidence = null,
-                    recommendation = "The server is temporarily unavailable. Please try again later.",
-                    details = "Server returned error ${e.code()}. This may be due to high server load or maintenance.",
-                    predictions = emptyList(),
-                    inference_time_seconds = 0.0,
-                    api_status = "server_error",
-                    is_offline = false,
-                    message = "Server is temporarily unavailable (${e.code()})",
-                    success = false
-                )
+                // Server error - but could also be "not a rice leaf" misclassified as server error
+                // Check if the error body contains rice leaf validation message
+                val errorBody = try {
+                    e.response()?.errorBody()?.string() ?: ""
+                } catch (ex: Exception) {
+                    ""
+                }
+                
+                // If error mentions rice leaf, treat it as validation error, not server error
+                if (errorBody.contains("rice leaf", ignoreCase = true) || 
+                    errorBody.contains("not a rice", ignoreCase = true)) {
+                    DiseaseDetectionResponse(
+                        is_rice_leaf = false,
+                        disease = null,
+                        confidence = null,
+                        recommendation = "Please upload a clear image of a rice leaf for analysis.",
+                        details = "The uploaded image does not appear to be a rice leaf.",
+                        predictions = emptyList(),
+                        inference_time_seconds = 0.0,
+                        api_status = "not_rice_leaf",
+                        is_offline = false,
+                        message = "Image is not recognized as a rice leaf",
+                        success = false
+                    )
+                } else {
+                    // Actual server error
+                    DiseaseDetectionResponse(
+                        is_rice_leaf = false,
+                        disease = null,
+                        confidence = null,
+                        recommendation = "The server is temporarily unavailable. Please try again later.",
+                        details = "The server encountered an error. This may be due to high server load or maintenance.",
+                        predictions = emptyList(),
+                        inference_time_seconds = 0.0,
+                        api_status = "server_error",
+                        is_offline = false,
+                        message = "Unable to connect to server. Please try again later.",
+                        success = false
+                    )
+                }
             }
             else -> {
                 // Other HTTP errors
@@ -242,7 +268,7 @@ class DiseaseDetectionService(private val context: Context) {
                     inference_time_seconds = 0.0,
                     api_status = "error",
                     is_offline = false,
-                    message = "Server error ${e.code()}: ${e.message()}",
+                    message = "An error occurred. Please try again.",
                     success = false
                 )
             }

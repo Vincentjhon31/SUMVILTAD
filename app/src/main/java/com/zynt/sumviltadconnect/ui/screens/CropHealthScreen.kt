@@ -41,6 +41,7 @@ import com.zynt.sumviltadconnect.data.model.CropHealthRecord
 import com.zynt.sumviltadconnect.data.model.CropHealthComment
 import com.zynt.sumviltadconnect.ui.components.BrandProgressIndicator
 import com.zynt.sumviltadconnect.ui.components.FullScreenSkeleton
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 import com.zynt.sumviltadconnect.ui.viewmodel.CropHealthUiState
 import com.zynt.sumviltadconnect.ui.viewmodel.CropHealthViewModel
 import com.zynt.sumviltadconnect.ui.viewmodel.CropHealthCommentsViewModel
@@ -139,9 +140,9 @@ private fun EnhancedCropHealthHeader(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = RoundedCornerShape(20.dp)
+            .padding(AppDimensions.paddingMedium()),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingSmall()),
+        shape = RoundedCornerShape(AppDimensions.paddingLarge())
     ) {
         Box {
             Box(
@@ -155,7 +156,7 @@ private fun EnhancedCropHealthHeader(
                             )
                         )
                     )
-                    .padding(24.dp)
+                    .padding(AppDimensions.paddingLarge())
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -192,18 +193,18 @@ private fun EnhancedCropHealthHeader(
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
 
                         FloatingActionButton(
                             onClick = onNewDetection,
                             containerColor = Color.White.copy(alpha = 0.9f),
                             contentColor = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(AppDimensions.iconSizeLarge())
                         ) {
                             Icon(
                                 Icons.Default.AddAPhoto,
                                 contentDescription = "New Detection",
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(AppDimensions.iconSizeMedium())
                             )
                         }
                     }
@@ -218,7 +219,7 @@ private fun EnhancedLoadingState() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(AppDimensions.paddingMedium())
     ) {
         FullScreenSkeleton(listItems = 6)
         Box(
@@ -226,8 +227,8 @@ private fun EnhancedLoadingState() {
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                BrandProgressIndicator(size = 56.dp)
-                Spacer(modifier = Modifier.height(16.dp))
+                BrandProgressIndicator(size = AppDimensions.buttonHeight())
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
                 Text(
                     "Loading crop health records...",
                     fontSize = 16.sp,
@@ -243,37 +244,37 @@ private fun EnhancedErrorState(message: String, onRetry: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(AppDimensions.paddingMedium()),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(AppDimensions.paddingLarge()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
                 Icons.Default.Error,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onErrorContainer,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(AppDimensions.iconSizeLarge())
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
             Text(
                 text = "Error loading records",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
             Text(
                 text = message,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
             Button(
                 onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(
@@ -281,7 +282,7 @@ private fun EnhancedErrorState(message: String, onRetry: () -> Unit) {
                 )
             ) {
                 Icon(Icons.Default.Refresh, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                 Text("Retry")
             }
         }
@@ -293,21 +294,21 @@ private fun EnhancedEmptyState(onNewDetection: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
+            .padding(AppDimensions.paddingExtraLarge()),
         contentAlignment = Alignment.Center
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            shape = RoundedCornerShape(20.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
+            shape = RoundedCornerShape(AppDimensions.paddingLarge())
         ) {
             Column(
-                modifier = Modifier.padding(32.dp),
+                modifier = Modifier.padding(AppDimensions.paddingExtraLarge()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(AppDimensions.fabSize())
                         .background(
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                             CircleShape
@@ -317,12 +318,12 @@ private fun EnhancedEmptyState(onNewDetection: () -> Unit) {
                     Icon(
                         Icons.Default.HealthAndSafety,
                         contentDescription = null,
-                        modifier = Modifier.size(40.dp),
+                        modifier = Modifier.size(AppDimensions.iconSizeLarge()),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
                 Text(
                     text = "No Records Yet",
@@ -331,7 +332,7 @@ private fun EnhancedEmptyState(onNewDetection: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
 
                 Text(
                     text = "Start detecting rice diseases to build your crop health history",
@@ -340,17 +341,17 @@ private fun EnhancedEmptyState(onNewDetection: () -> Unit) {
                     lineHeight = 20.sp
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
                 Button(
                     onClick = onNewDetection,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp)
+                        .height(AppDimensions.buttonHeight()),
+                    shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
                 ) {
                     Icon(Icons.Default.AddAPhoto, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                     Text(
                         "Start First Detection",
                         fontSize = 16.sp,
@@ -384,9 +385,9 @@ private fun EnhancedCropHealthList(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 16.dp)
+                .padding(horizontal = AppDimensions.paddingMedium()),
+            verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium()),
+            contentPadding = PaddingValues(bottom = AppDimensions.paddingMedium())
         ) {
             item(key = "header") {
                 AnimatedVisibility(
@@ -401,7 +402,7 @@ private fun EnhancedCropHealthList(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = AppDimensions.paddingSmall())
                     )
                 }
             }
@@ -449,7 +450,7 @@ private fun EnhancedCropHealthList(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 16.dp),
+                                .padding(vertical = AppDimensions.paddingMedium()),
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                     }
@@ -519,12 +520,12 @@ private fun EnhancedCropHealthItem(
     Card(
         modifier = Modifier
             .fillMaxWidth(), // removed overall clickable to avoid intercepting icon taps
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
     ) {
         Column(
             modifier = Modifier
-                .padding(20.dp)
+                .padding(AppDimensions.paddingLarge())
                 .clickable { onClick() } // make body clickable instead
         ) {
             // Header with disease status and actions
@@ -538,19 +539,19 @@ private fun EnhancedCropHealthItem(
                     record.disease?.contains("no disease", ignoreCase = true) == true
                 Surface(
                     color = if (isHealthy) Color(0xFF4CAF50).copy(alpha = 0.1f) else Color(0xFFFF5722).copy(alpha = 0.1f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(AppDimensions.paddingMedium())
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium(), vertical = AppDimensions.paddingExtraSmall()),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             if (isHealthy) Icons.Default.CheckCircle else Icons.Default.Warning,
                             contentDescription = null,
                             tint = if (isHealthy) Color(0xFF4CAF50) else Color(0xFFFF5722),
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(AppDimensions.iconSizeSmall())
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(AppDimensions.paddingExtraSmall()))
                         Text(
                             text = record.disease ?: "Unknown",
                             fontSize = 14.sp,
@@ -562,12 +563,12 @@ private fun EnhancedCropHealthItem(
 
                 // Action buttons
                 Row {
-                    IconButton(onClick = { onCommentsClick(record) }, modifier = Modifier.size(40.dp)) {
+                    IconButton(onClick = { onCommentsClick(record) }, modifier = Modifier.size(AppDimensions.iconSizeLarge())) {
                         Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Comments", tint = MaterialTheme.colorScheme.secondary)
                     }
                     IconButton(
                         onClick = onClick,
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(AppDimensions.iconSizeLarge())
                     ) {
                         Icon(
                             Icons.Default.Visibility,
@@ -578,7 +579,7 @@ private fun EnhancedCropHealthItem(
 
                     IconButton(
                         onClick = onDeleteClick,
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(AppDimensions.iconSizeLarge())
                     ) {
                         Icon(
                             Icons.Default.Delete,
@@ -589,7 +590,7 @@ private fun EnhancedCropHealthItem(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
             // Image and details
             Row(
@@ -606,14 +607,14 @@ private fun EnhancedCropHealthItem(
                             .build(),
                         contentDescription = "Detection image",
                         modifier = Modifier
-                            .size(80.dp)
-                            .clip(RoundedCornerShape(12.dp)),
+                            .size(AppDimensions.fabSize())
+                            .clip(RoundedCornerShape(AppDimensions.paddingMedium())),
                         contentScale = ContentScale.Crop,
                         error = androidx.compose.ui.res.painterResource(android.R.drawable.ic_menu_gallery),
                         placeholder = androidx.compose.ui.res.painterResource(android.R.drawable.ic_menu_gallery)
                     )
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
                 }
 
                 // Details
@@ -627,7 +628,7 @@ private fun EnhancedCropHealthItem(
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.paddingExtraSmall()))
                     }
 
                     // Recommendation preview
@@ -639,7 +640,7 @@ private fun EnhancedCropHealthItem(
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.paddingExtraSmall()))
                     }
 
                     // Admin recommendation indicator
@@ -651,9 +652,9 @@ private fun EnhancedCropHealthItem(
                                 Icons.Default.AdminPanelSettings,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.tertiary,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(AppDimensions.iconSizeSmall())
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                            Spacer(modifier = Modifier.width(AppDimensions.paddingExtraSmall()))
                             Text(
                                 text = "Admin recommendation available",
                                 fontSize = 12.sp,
@@ -713,9 +714,9 @@ private fun CommentsDialog(
                     this.scaleY = scale
                     this.alpha = alpha
                 },
-            shape = RoundedCornerShape(28.dp),
-            tonalElevation = 8.dp,
-            shadowElevation = 16.dp,
+            shape = RoundedCornerShape(AppDimensions.paddingLarge()),
+            tonalElevation = AppDimensions.paddingSmall(),
+            shadowElevation = AppDimensions.paddingMedium(),
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(Modifier.fillMaxSize()) {
@@ -733,21 +734,21 @@ private fun CommentsDialog(
                         )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(AppDimensions.paddingMedium())
                     ) {
                         // Drag indicator
                         Box(
                             modifier = Modifier
-                                .width(40.dp)
-                                .height(4.dp)
+                                .width(AppDimensions.iconSizeLarge())
+                                .height(AppDimensions.paddingExtraSmall())
                                 .align(Alignment.CenterHorizontally)
                                 .background(
                                     MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
-                                    RoundedCornerShape(2.dp)
+                                    RoundedCornerShape(AppDimensions.paddingExtraSmall())
                                 )
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -781,13 +782,13 @@ private fun CommentsDialog(
                     }
                 }
 
-                HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                HorizontalDivider(thickness = AppDimensions.paddingExtraSmall(), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
                 // Enhanced comments content
                 Box(
                     Modifier
                         .weight(1f)
-                        .padding(16.dp)
+                        .padding(AppDimensions.paddingMedium())
                 ) {
                     EnhancedCommentsSection(record)
                 }
@@ -826,11 +827,11 @@ private fun EnhancedCommentsSection(record: CropHealthRecord) {
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(32.dp),
-                                strokeWidth = 3.dp,
+                                modifier = Modifier.size(AppDimensions.iconSizeMedium()),
+                                strokeWidth = AppDimensions.paddingExtraSmall(),
                                 color = MaterialTheme.colorScheme.primary
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                             Text(
                                 "Loading conversation...",
                                 fontSize = 14.sp,
@@ -847,15 +848,15 @@ private fun EnhancedCommentsSection(record: CropHealthRecord) {
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.padding(24.dp)
+                            modifier = Modifier.padding(AppDimensions.paddingLarge())
                         ) {
                             Icon(
                                 Icons.Default.ErrorOutline,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier.size(AppDimensions.iconSizeLarge())
                             )
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
                             Text(
                                 text = "Failed to load conversation",
                                 fontSize = 16.sp,
@@ -880,22 +881,22 @@ private fun EnhancedCommentsSection(record: CropHealthRecord) {
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier.padding(32.dp)
+                                modifier = Modifier.padding(AppDimensions.paddingExtraLarge())
                             ) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.Chat,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                                    modifier = Modifier.size(64.dp)
+                                    modifier = Modifier.size(AppDimensions.buttonHeight())
                                 )
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
                                 Text(
                                     text = "No messages yet",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                                 Text(
                                     text = "Start a conversation with agricultural experts",
                                     fontSize = 14.sp,
@@ -907,8 +908,8 @@ private fun EnhancedCommentsSection(record: CropHealthRecord) {
                     } else {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            contentPadding = PaddingValues(vertical = 16.dp)
+                            verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium()),
+                            contentPadding = PaddingValues(vertical = AppDimensions.paddingMedium())
                         ) {
                             items(currentCommentsState.comments) { comment ->
                                 iMessageStyleComment(
@@ -926,12 +927,12 @@ private fun EnhancedCommentsSection(record: CropHealthRecord) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 8.dp
+            shadowElevation = AppDimensions.paddingSmall()
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(AppDimensions.paddingMedium()),
                 verticalAlignment = Alignment.Bottom
             ) {
                 OutlinedTextField(
@@ -939,7 +940,7 @@ private fun EnhancedCommentsSection(record: CropHealthRecord) {
                     onValueChange = { newMessage = it },
                     modifier = Modifier
                         .weight(1f)
-                        .heightIn(min = 48.dp, max = 120.dp),
+                        .heightIn(min = AppDimensions.iconSizeLarge(), max = AppDimensions.detectionImageHeight()),
                     placeholder = {
                         Text(
                             "Message...",
@@ -947,14 +948,14 @@ private fun EnhancedCommentsSection(record: CropHealthRecord) {
                         )
                     },
                     maxLines = 4,
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(AppDimensions.paddingLarge()),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                         focusedBorderColor = MaterialTheme.colorScheme.primary
                     )
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
 
                 val isLoading = currentCommentsState is CommentsUiState.Success && currentCommentsState.isLoading
 
@@ -966,7 +967,7 @@ private fun EnhancedCommentsSection(record: CropHealthRecord) {
                         }
                     },
                     enabled = newMessage.isNotBlank() && !isLoading,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(AppDimensions.iconSizeLarge()),
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = if (newMessage.isNotBlank())
                             MaterialTheme.colorScheme.primary
@@ -980,15 +981,15 @@ private fun EnhancedCommentsSection(record: CropHealthRecord) {
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp,
+                            modifier = Modifier.size(AppDimensions.iconSizeSmall()),
+                            strokeWidth = AppDimensions.paddingExtraSmall(),
                             color = Color.White
                         )
                     } else {
                         Icon(
                             Icons.AutoMirrored.Filled.Send,
                             contentDescription = "Send",
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(AppDimensions.iconSizeSmall())
                         )
                     }
                 }
@@ -1008,12 +1009,12 @@ private fun iMessageStyleComment(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp),
+            .padding(horizontal = AppDimensions.paddingMedium()),
         horizontalAlignment = alignment
     ) {
         // Sender name and time
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingExtraSmall()),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = if (isFromExpert) Arrangement.Start else Arrangement.End
         ) {
@@ -1022,9 +1023,9 @@ private fun iMessageStyleComment(
                     Icons.Default.AdminPanelSettings,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(14.dp)
+                    modifier = Modifier.size(AppDimensions.iconSizeSmall())
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(AppDimensions.paddingExtraSmall()))
             }
             Text(
                 text = comment.user?.name ?: "Unknown User",
@@ -1035,7 +1036,7 @@ private fun iMessageStyleComment(
                 else
                     MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
             Text(
                 text = formatDate(comment.created_at),
                 fontSize = 11.sp,
@@ -1045,18 +1046,18 @@ private fun iMessageStyleComment(
 
         // Message bubble - iPhone style
         Surface(
-            modifier = Modifier.widthIn(max = 300.dp),
+            modifier = Modifier.widthIn(max = AppDimensions.detectionImageHeight()),
             shape = RoundedCornerShape(
-                topStart = if (isFromExpert) 4.dp else 18.dp,
-                topEnd = if (isFromExpert) 18.dp else 4.dp,
-                bottomStart = 18.dp,
-                bottomEnd = 18.dp
+                topStart = if (isFromExpert) AppDimensions.paddingExtraSmall() else AppDimensions.cornerRadiusMedium(),
+                topEnd = if (isFromExpert) AppDimensions.cornerRadiusMedium() else AppDimensions.paddingExtraSmall(),
+                bottomStart = AppDimensions.cornerRadiusMedium(),
+                bottomEnd = AppDimensions.cornerRadiusMedium()
             ),
             color = if (isFromExpert)
                 MaterialTheme.colorScheme.secondaryContainer
             else
                 MaterialTheme.colorScheme.primary,
-            shadowElevation = 1.dp
+            shadowElevation = AppDimensions.paddingExtraSmall()
         ) {
             Text(
                 text = comment.message,
@@ -1066,7 +1067,7 @@ private fun iMessageStyleComment(
                 else
                     MaterialTheme.colorScheme.onPrimary,
                 lineHeight = 20.sp,
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)
+                modifier = Modifier.padding(horizontal = AppDimensions.iconSizeSmall(), vertical = AppDimensions.paddingSmall())
             )
         }
 
@@ -1074,17 +1075,17 @@ private fun iMessageStyleComment(
         if (!comment.is_read && !comment.is_admin_response) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingExtraSmall())
             ) {
                 Box(
                     modifier = Modifier
-                        .size(6.dp)
+                        .size(AppDimensions.paddingExtraSmall())
                         .background(
                             MaterialTheme.colorScheme.primary,
                             CircleShape
                         )
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(AppDimensions.paddingExtraSmall()))
                 Text(
                     text = "New",
                     fontSize = 11.sp,

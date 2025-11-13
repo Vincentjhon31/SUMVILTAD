@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import com.zynt.sumviltadconnect.ui.components.BrandProgressIndicator
 import com.zynt.sumviltadconnect.ui.components.FullScreenSkeleton
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +66,7 @@ fun HistoryScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(AppDimensions.paddingMedium())
         ) {
             when {
                 isLoading -> {
@@ -173,10 +174,10 @@ fun HistoryScreen(
 fun HistoryRecordCard(record: CropHealthRecord) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation())
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(AppDimensions.paddingMedium())
         ) {
             // Header with date
             Row(

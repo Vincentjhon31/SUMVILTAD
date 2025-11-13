@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 
 @Stable
 private class EventDetailsViewModel(private val repo: FarmerRepository = FarmerRepository()): ViewModel() {
@@ -94,7 +95,7 @@ fun EventDetailsScreen(eventId: Int, onBack: () -> Unit) {
 
 @Composable
 private fun DetailsLoadingSkeleton() {
-    Column(Modifier.fillMaxSize().padding(16.dp)) {
+    Column(Modifier.fillMaxSize().padding(AppDimensions.paddingMedium())) {
         repeat(5) {
             Box(Modifier.fillMaxWidth().height(24.dp).shimmerBar())
             Spacer(Modifier.height(12.dp))
@@ -110,7 +111,7 @@ private fun DetailsLoadingSkeleton() {
 @Composable
 private fun DetailsError(message: String, onRetry: () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
+        modifier = Modifier.fillMaxSize().padding(AppDimensions.paddingExtraLarge()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -139,9 +140,9 @@ private fun HeaderSection(event: Event) {
     val tf = remember { SimpleDateFormat("h:mm a", Locale.getDefault()) }
 
     Card(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(AppDimensions.paddingMedium()),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusLarge())
     ) {
         Column(
             Modifier.fillMaxWidth().background(
@@ -170,7 +171,7 @@ private fun HeaderSection(event: Event) {
 
 @Composable
 private fun BodySection(event: Event) {
-    Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Column(Modifier.padding(horizontal = AppDimensions.paddingMedium(), vertical = AppDimensions.paddingSmall())) {
         InfoRow(icon = Icons.Default.Schedule, label = "Starts", value = event.eventDate ?: "—")
         event.endDate?.let { InfoRow(icon = Icons.Default.Schedule, label = "Ends", value = it) }
         event.location?.let { InfoRow(icon = Icons.Default.LocationOn, label = "Location", value = it) }

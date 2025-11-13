@@ -33,6 +33,7 @@ import com.zynt.sumviltadconnect.ui.viewmodel.AuthViewModel
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.ContextCompat
 import com.zynt.sumviltadconnect.R
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 
 // Helper function to safely load app icon
 @Composable
@@ -125,7 +126,7 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(AppDimensions.paddingLarge())
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -133,7 +134,7 @@ fun LoginScreen(
             // Enhanced Logo Section
             Box(
                 modifier = Modifier
-                    .size(140.dp)
+                    .size(AppDimensions.logoSizeLarge())
                     .background(
                         Brush.radialGradient(
                             colors = listOf(
@@ -183,8 +184,8 @@ fun LoginScreen(
             // Enhanced Login Form Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                shape = RoundedCornerShape(20.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
+                shape = RoundedCornerShape(AppDimensions.cornerRadiusLarge())
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp)

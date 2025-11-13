@@ -24,6 +24,7 @@ import com.zynt.sumviltadconnect.ui.viewmodel.AuthViewModel
 import com.zynt.sumviltadconnect.ui.viewmodel.SettingsViewModel
 import com.zynt.sumviltadconnect.ui.viewmodel.UpdateViewModel
 import com.zynt.sumviltadconnect.ui.viewmodel.UpdateState
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 import com.zynt.sumviltadconnect.utils.TokenManager
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,7 +83,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(16.dp)
+                .padding(AppDimensions.paddingMedium())
         ) {
             // Update Available Banner
             if (updateState is UpdateState.UpdateAvailable) {
@@ -100,16 +101,16 @@ fun ProfileScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(AppDimensions.paddingMedium()),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             Icons.Default.NewReleases,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(AppDimensions.iconSizeMedium())
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 "Update Available!",
@@ -131,7 +132,7 @@ fun ProfileScreen(
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
             }
 
             // Profile Header
@@ -142,12 +143,12 @@ fun ProfileScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(AppDimensions.paddingLarge()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Profile Avatar
                     Surface(
-                        modifier = Modifier.size(80.dp),
+                        modifier = Modifier.size(AppDimensions.fabSize()),
                         shape = MaterialTheme.shapes.large,
                         color = MaterialTheme.colorScheme.primary
                     ) {
@@ -190,7 +191,7 @@ fun ProfileScreen(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
 
             // Account Information Card
             Card(
@@ -224,7 +225,7 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
             // App Information
             Text(
@@ -234,7 +235,7 @@ fun ProfileScreen(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
 
             Card(
                 modifier = Modifier.fillMaxWidth()
@@ -270,7 +271,7 @@ fun ProfileScreen(
                             when (updateState) {
                                 is UpdateState.Checking -> {
                                     CircularProgressIndicator(
-                                        modifier = Modifier.size(20.dp),
+                                        modifier = Modifier.size(AppDimensions.iconSizeSmall()),
                                         strokeWidth = 2.dp
                                     )
                                 }
@@ -279,7 +280,7 @@ fun ProfileScreen(
                                         Icons.Default.NewReleases,
                                         contentDescription = "Update available",
                                         tint = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.size(24.dp)
+                                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
                                     )
                                 }
                                 is UpdateState.UpToDate -> {
@@ -287,7 +288,7 @@ fun ProfileScreen(
                                         Icons.Default.CheckCircle,
                                         contentDescription = "Up to date",
                                         tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(24.dp)
+                                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
                                     )
                                 }
                                 else -> null
@@ -319,7 +320,7 @@ fun ProfileScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-                                .padding(16.dp)
+                                .padding(AppDimensions.paddingMedium())
                         ) {
                             // Theme Settings
                             Text(
@@ -327,7 +328,7 @@ fun ProfileScreen(
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(bottom = 12.dp)
+                                modifier = Modifier.padding(bottom = AppDimensions.paddingSmall())
                             )
 
                             // Theme options
@@ -338,7 +339,7 @@ fun ProfileScreen(
                                 onClick = { settingsViewModel.setTheme("light") }
                             )
 
-                            Spacer(Modifier.height(8.dp))
+                            Spacer(Modifier.height(AppDimensions.paddingSmall()))
 
                             SettingsThemeOption(
                                 title = "Dark Mode",
@@ -347,7 +348,7 @@ fun ProfileScreen(
                                 onClick = { settingsViewModel.setTheme("dark") }
                             )
 
-                            Spacer(Modifier.height(8.dp))
+                            Spacer(Modifier.height(AppDimensions.paddingSmall()))
 
                             SettingsThemeOption(
                                 title = "System Default",
@@ -356,15 +357,15 @@ fun ProfileScreen(
                                 onClick = { settingsViewModel.setTheme("system") }
                             )
 
-                            Spacer(Modifier.height(16.dp))
+                            Spacer(Modifier.height(AppDimensions.paddingMedium()))
 
                             // Notifications Toggle
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
+                                    .clip(RoundedCornerShape(AppDimensions.cornerRadiusMedium()))
                                     .background(MaterialTheme.colorScheme.surface)
-                                    .padding(16.dp),
+                                    .padding(AppDimensions.paddingMedium()),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
@@ -374,9 +375,9 @@ fun ProfileScreen(
                                         MaterialTheme.colorScheme.primary
                                     else
                                         MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(AppDimensions.iconSizeMedium())
                                 )
-                                Spacer(Modifier.width(12.dp))
+                                Spacer(Modifier.width(AppDimensions.paddingSmall()))
                                 Column(Modifier.weight(1f)) {
                                     Text(
                                         "Notifications",
@@ -404,14 +405,14 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingExtraLarge()))
 
             // Logout Button
             Button(
                 onClick = { showLogoutDialog = true },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp),
+                    .height(AppDimensions.buttonHeight()),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.error
                 ),
@@ -419,21 +420,21 @@ fun ProfileScreen(
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(AppDimensions.iconSizeSmall()),
                         color = MaterialTheme.colorScheme.onError
                     )
                 } else {
                     Icon(Icons.Default.Logout, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                     Text("Logout")
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
             // App Version
             Text(
-                text = "SumviltadConnect v1.0",
+                text = "SumviltadConnect v${BuildConfig.VERSION_NAME}",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth()
@@ -573,7 +574,7 @@ fun ProfileScreen(
 
                     // Version Info
                     Text(
-                        "Version 1.0",
+                        "Version ${BuildConfig.VERSION_NAME}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.fillMaxWidth(),
@@ -633,7 +634,7 @@ fun ProfileScreen(
                                     Icons.Default.Email,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(AppDimensions.iconSizeMedium())
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
@@ -714,7 +715,7 @@ fun ProfileScreen(
                                     Icons.Default.Code,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.tertiary,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(AppDimensions.iconSizeMedium())
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
@@ -908,17 +909,17 @@ private fun ProfileMenuItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(16.dp),
+            .padding(AppDimensions.paddingMedium()),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(AppDimensions.iconSizeMedium())
         )
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -964,7 +965,7 @@ private fun SettingsThemeOption(
                 else
                     MaterialTheme.colorScheme.surface
             )
-            .padding(16.dp),
+            .padding(AppDimensions.paddingMedium()),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -974,9 +975,9 @@ private fun SettingsThemeOption(
                 MaterialTheme.colorScheme.primary
             else
                 MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(AppDimensions.iconSizeMedium())
         )
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(AppDimensions.paddingSmall()))
         Text(
             title,
             style = MaterialTheme.typography.bodyMedium,
@@ -992,7 +993,7 @@ private fun SettingsThemeOption(
                 Icons.Default.Check,
                 contentDescription = "Selected",
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(AppDimensions.iconSizeSmall())
             )
         }
     }
@@ -1003,16 +1004,16 @@ private fun GoalItem(text: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = AppDimensions.paddingExtraSmall()),
         verticalAlignment = Alignment.Top
     ) {
         Icon(
             Icons.Default.Check,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(AppDimensions.iconSizeSmall())
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
         Text(
             text,
             style = MaterialTheme.typography.bodyMedium,
@@ -1032,7 +1033,7 @@ private fun HelpItem(title: String, description: String) {
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingExtraSmall()))
         Text(
             description,
             style = MaterialTheme.typography.bodySmall,

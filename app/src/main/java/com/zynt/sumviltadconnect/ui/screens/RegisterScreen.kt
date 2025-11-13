@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import androidx.core.content.ContextCompat
 import com.zynt.sumviltadconnect.R
 import com.zynt.sumviltadconnect.ui.viewmodel.AuthViewModel
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 
 // Helper function to safely load app icon
 @Composable
@@ -89,7 +90,7 @@ fun RegisterScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(AppDimensions.paddingLarge()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -103,11 +104,11 @@ fun RegisterScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
         // App Logo/Icon
         AppIcon(
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(AppDimensions.logoSizeLarge())
         )
 
         Spacer(modifier = Modifier.height(16.dp))

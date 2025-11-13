@@ -34,6 +34,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 import com.zynt.sumviltadconnect.ui.viewmodel.DiseaseDetectionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -94,7 +95,7 @@ fun DiseaseDetectionScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(AppDimensions.paddingMedium()),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
@@ -127,33 +128,33 @@ fun DiseaseDetectionScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = AppDimensions.paddingMedium()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
             // Instructions Card - Only show if no image selected
             if (selectedImageUri == null && detectionResult == null) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .shadow(4.dp, RoundedCornerShape(16.dp)),
-                    shape = RoundedCornerShape(16.dp),
+                        .shadow(4.dp, RoundedCornerShape(AppDimensions.cornerRadiusMedium())),
+                    shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer
                     )
                 ) {
                     Row(
-                        modifier = Modifier.padding(20.dp),
+                        modifier = Modifier.padding(AppDimensions.paddingLarge()),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             Icons.Default.Info,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(40.dp)
+                            modifier = Modifier.size(AppDimensions.iconSizeLarge())
                         )
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
                         Column {
                             Text(
                                 text = "How to get accurate results:",
@@ -161,7 +162,7 @@ fun DiseaseDetectionScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                             Text(
                                 text = "• Use clear, well-lit photos\n• Focus on diseased leaf areas\n• Avoid blurry or dark images\n• One leaf per photo works best",
                                 fontSize = 14.sp,
@@ -172,7 +173,7 @@ fun DiseaseDetectionScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
             }
 
             // Image capture buttons - Enhanced design
@@ -180,14 +181,14 @@ fun DiseaseDetectionScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .shadow(2.dp, RoundedCornerShape(20.dp)),
-                    shape = RoundedCornerShape(20.dp),
+                        .shadow(2.dp, RoundedCornerShape(AppDimensions.cornerRadiusLarge())),
+                    shape = RoundedCornerShape(AppDimensions.cornerRadiusLarge()),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
+                        modifier = Modifier.padding(AppDimensions.paddingLarge()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
@@ -197,7 +198,7 @@ fun DiseaseDetectionScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
 
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
                         // Camera Button - Enhanced
                         Button(
@@ -210,8 +211,8 @@ fun DiseaseDetectionScreen(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(60.dp),
-                            shape = RoundedCornerShape(16.dp),
+                                .height(AppDimensions.buttonHeight()),
+                            shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary
                             )
@@ -219,9 +220,9 @@ fun DiseaseDetectionScreen(
                             Icon(
                                 Icons.Default.CameraAlt,
                                 contentDescription = null,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(AppDimensions.iconSizeMedium())
                             )
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                             Text(
                                 "Take Photo",
                                 fontSize = 16.sp,
@@ -229,15 +230,15 @@ fun DiseaseDetectionScreen(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
 
                         // Gallery Button - Enhanced
                         OutlinedButton(
                             onClick = { galleryLauncher.launch("image/*") },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(60.dp),
-                            shape = RoundedCornerShape(16.dp),
+                                .height(AppDimensions.buttonHeight()),
+                            shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
                             border = ButtonDefaults.outlinedButtonBorder.copy(
                                 width = 2.dp
                             )
@@ -245,9 +246,9 @@ fun DiseaseDetectionScreen(
                             Icon(
                                 Icons.Default.PhotoLibrary,
                                 contentDescription = null,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(AppDimensions.iconSizeMedium())
                             )
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                             Text(
                                 "Choose from Gallery",
                                 fontSize = 16.sp,
@@ -260,13 +261,13 @@ fun DiseaseDetectionScreen(
 
             // Selected Image Display - Enhanced
             selectedImageUri?.let { uri ->
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .shadow(8.dp, RoundedCornerShape(20.dp)),
-                    shape = RoundedCornerShape(20.dp)
+                        .shadow(8.dp, RoundedCornerShape(AppDimensions.cornerRadiusLarge())),
+                    shape = RoundedCornerShape(AppDimensions.cornerRadiusLarge())
                 ) {
                     Box {
                         Image(
@@ -274,7 +275,7 @@ fun DiseaseDetectionScreen(
                             contentDescription = "Selected rice leaf",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(300.dp),
+                                .height(AppDimensions.detectionImageHeight()),
                             contentScale = ContentScale.Crop
                         )
 
@@ -291,16 +292,16 @@ fun DiseaseDetectionScreen(
                                 ) {
                                     CircularProgressIndicator(
                                         color = Color.White,
-                                        modifier = Modifier.size(48.dp)
+                                        modifier = Modifier.size(AppDimensions.fabSize())
                                     )
-                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
                                     Text(
                                         "Analyzing image...",
                                         color = Color.White,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Medium
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                                     Text(
                                         "This may take a few seconds",
                                         color = Color.White.copy(alpha = 0.8f),
@@ -315,31 +316,31 @@ fun DiseaseDetectionScreen(
 
             // Error Message - Enhanced
             errorMessage?.let { error ->
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .border(
                             2.dp,
                             MaterialTheme.colorScheme.error,
-                            RoundedCornerShape(16.dp)
+                            RoundedCornerShape(AppDimensions.cornerRadiusMedium())
                         ),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.errorContainer
                     )
                 ) {
                     Row(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(AppDimensions.paddingMedium()),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = Icons.Default.Error,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(AppDimensions.iconSizeMedium())
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                         Text(
                             text = error,
                             color = MaterialTheme.colorScheme.onErrorContainer,
@@ -352,21 +353,21 @@ fun DiseaseDetectionScreen(
 
             // Detection Results - Completely redesigned
             detectionResult?.let { result ->
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
                 if (result.is_rice_leaf) {
                     // Success Result Card
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .shadow(8.dp, RoundedCornerShape(20.dp)),
-                        shape = RoundedCornerShape(20.dp),
+                            .shadow(8.dp, RoundedCornerShape(AppDimensions.cornerRadiusLarge())),
+                        shape = RoundedCornerShape(AppDimensions.cornerRadiusLarge()),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface
                         )
                     ) {
                         Column(
-                            modifier = Modifier.padding(24.dp)
+                            modifier = Modifier.padding(AppDimensions.paddingLarge())
                         ) {
                             // Header with success icon
                             Row(
@@ -374,7 +375,7 @@ fun DiseaseDetectionScreen(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(48.dp)
+                                        .size(AppDimensions.iconSizeLarge() + 16.dp)
                                         .background(
                                             Color(0xFF4CAF50).copy(alpha = 0.1f),
                                             CircleShape
@@ -385,10 +386,10 @@ fun DiseaseDetectionScreen(
                                         Icons.Default.CheckCircle,
                                         contentDescription = "Success",
                                         tint = Color(0xFF4CAF50),
-                                        modifier = Modifier.size(32.dp)
+                                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
                                     )
                                 }
-                                Spacer(modifier = Modifier.width(16.dp))
+                                Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
                                 Column {
                                     Text(
                                         text = "Analysis Complete",
@@ -404,18 +405,18 @@ fun DiseaseDetectionScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
                             // Disease Information Card
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(16.dp),
+                                shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer
                                 )
                             ) {
                                 Column(
-                                    modifier = Modifier.padding(16.dp)
+                                    modifier = Modifier.padding(AppDimensions.paddingMedium())
                                 ) {
                                     Text(
                                         text = "Detected Disease",
@@ -438,7 +439,7 @@ fun DiseaseDetectionScreen(
 
                             // Confidence Level - Visual indicator
                             result.confidence?.let { confidence ->
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
                                 val confidenceColor = when {
                                     confidence >= 80 -> Color(0xFF4CAF50)
@@ -454,13 +455,13 @@ fun DiseaseDetectionScreen(
 
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(16.dp),
+                                    shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
                                     colors = CardDefaults.cardColors(
                                         containerColor = confidenceColor.copy(alpha = 0.1f)
                                     )
                                 ) {
                                     Column(
-                                        modifier = Modifier.padding(16.dp)
+                                        modifier = Modifier.padding(AppDimensions.paddingMedium())
                                     ) {
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
@@ -474,7 +475,7 @@ fun DiseaseDetectionScreen(
                                                     fontWeight = FontWeight.Medium,
                                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                                 )
-                                                Spacer(modifier = Modifier.height(4.dp))
+                                                Spacer(modifier = Modifier.height(AppDimensions.paddingExtraSmall()))
                                                 Text(
                                                     text = confidenceLabel,
                                                     fontSize = 14.sp,
@@ -490,15 +491,15 @@ fun DiseaseDetectionScreen(
                                             )
                                         }
 
-                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
 
                                         // Progress bar
                                         LinearProgressIndicator(
                                             progress = (confidence / 100).toFloat(),
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .height(8.dp)
-                                                .clip(RoundedCornerShape(4.dp)),
+                                                .height(AppDimensions.paddingSmall())
+                                                .clip(RoundedCornerShape(AppDimensions.cornerRadiusSmall())),
                                             color = confidenceColor,
                                             trackColor = confidenceColor.copy(alpha = 0.2f)
                                         )
@@ -508,17 +509,17 @@ fun DiseaseDetectionScreen(
 
                             // Recommendations Section
                             result.recommendation?.let { recommendation ->
-                                Spacer(modifier = Modifier.height(20.dp))
+                                Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(16.dp),
+                                    shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
                                     colors = CardDefaults.cardColors(
                                         containerColor = MaterialTheme.colorScheme.secondaryContainer
                                     )
                                 ) {
                                     Column(
-                                        modifier = Modifier.padding(16.dp)
+                                        modifier = Modifier.padding(AppDimensions.paddingMedium())
                                     ) {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically
@@ -527,9 +528,9 @@ fun DiseaseDetectionScreen(
                                                 Icons.Default.Lightbulb,
                                                 contentDescription = null,
                                                 tint = MaterialTheme.colorScheme.secondary,
-                                                modifier = Modifier.size(24.dp)
+                                                modifier = Modifier.size(AppDimensions.iconSizeMedium())
                                             )
-                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                                             Text(
                                                 text = "Recommendations",
                                                 fontSize = 16.sp,
@@ -537,7 +538,7 @@ fun DiseaseDetectionScreen(
                                                 color = MaterialTheme.colorScheme.onSecondaryContainer
                                             )
                                         }
-                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                                         Text(
                                             text = recommendation,
                                             fontSize = 14.sp,
@@ -550,17 +551,17 @@ fun DiseaseDetectionScreen(
 
                             // Details Section
                             result.details?.let { details ->
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(16.dp),
+                                    shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
                                     colors = CardDefaults.cardColors(
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                                     )
                                 ) {
                                     Column(
-                                        modifier = Modifier.padding(16.dp)
+                                        modifier = Modifier.padding(AppDimensions.paddingMedium())
                                     ) {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically
@@ -569,9 +570,9 @@ fun DiseaseDetectionScreen(
                                                 Icons.Default.Description,
                                                 contentDescription = null,
                                                 tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(20.dp)
+                                                modifier = Modifier.size(AppDimensions.iconSizeSmall())
                                             )
-                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                                             Text(
                                                 text = "Additional Details",
                                                 fontSize = 14.sp,
@@ -579,7 +580,7 @@ fun DiseaseDetectionScreen(
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         }
-                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                                         Text(
                                             text = details,
                                             fontSize = 13.sp,
@@ -600,20 +601,20 @@ fun DiseaseDetectionScreen(
                             .border(
                                 2.dp,
                                 MaterialTheme.colorScheme.error,
-                                RoundedCornerShape(20.dp)
+                                RoundedCornerShape(AppDimensions.cornerRadiusLarge())
                             ),
-                        shape = RoundedCornerShape(20.dp),
+                        shape = RoundedCornerShape(AppDimensions.cornerRadiusLarge()),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer
                         )
                     ) {
                         Column(
-                            modifier = Modifier.padding(24.dp),
+                            modifier = Modifier.padding(AppDimensions.paddingLarge()),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(64.dp)
+                                    .size(AppDimensions.iconSizeLarge() + 28.dp)
                                     .background(
                                         MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
                                         CircleShape
@@ -624,11 +625,11 @@ fun DiseaseDetectionScreen(
                                     Icons.Default.Error,
                                     contentDescription = "Error",
                                     tint = MaterialTheme.colorScheme.error,
-                                    modifier = Modifier.size(40.dp)
+                                    modifier = Modifier.size(AppDimensions.iconSizeLarge())
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
                             Text(
                                 text = "Not a Rice Leaf",
@@ -638,7 +639,7 @@ fun DiseaseDetectionScreen(
                                 textAlign = TextAlign.Center
                             )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
 
                             Text(
                                 text = "The image doesn't appear to be a rice leaf. Please capture a clear photo of rice plant leaves for accurate disease detection.",
@@ -652,25 +653,25 @@ fun DiseaseDetectionScreen(
                 }
 
                 // Action Buttons - Enhanced
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingSmall())
                 ) {
                     OutlinedButton(
                         onClick = { viewModel.clearResult() },
                         modifier = Modifier
                             .weight(1f)
-                            .height(56.dp),
-                        shape = RoundedCornerShape(16.dp)
+                            .height(AppDimensions.buttonHeight()),
+                        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
                     ) {
                         Icon(
                             Icons.Default.Refresh,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(AppDimensions.iconSizeSmall())
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                         Text("New Scan", fontSize = 15.sp)
                     }
 
@@ -678,21 +679,21 @@ fun DiseaseDetectionScreen(
                         onClick = { navController.navigate("crop_health") },
                         modifier = Modifier
                             .weight(1f)
-                            .height(56.dp),
-                        shape = RoundedCornerShape(16.dp)
+                            .height(AppDimensions.buttonHeight()),
+                        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
                     ) {
                         Icon(
                             Icons.Default.History,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(AppDimensions.iconSizeSmall())
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                         Text("View History", fontSize = 15.sp)
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
         }
     }
 }

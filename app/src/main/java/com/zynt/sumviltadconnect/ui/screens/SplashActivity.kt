@@ -26,9 +26,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.zynt.sumviltadconnect.BuildConfig
 import com.zynt.sumviltadconnect.MainActivity
 import com.zynt.sumviltadconnect.R
 import com.zynt.sumviltadconnect.ui.theme.SumviltadConnectTheme
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 import kotlinx.coroutines.delay
 
 // Helper function to safely load app icon
@@ -167,12 +169,12 @@ fun SplashScreen(onTimeout: () -> Unit) {
             // App Logo with animations using the actual launcher icon
             AppIcon(
                 modifier = Modifier
-                    .size(110.dp)
+                    .size(AppDimensions.splashLogoSize())
                     .scale(scale)
                     .alpha(alpha)
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingExtraLarge()))
 
             // App Name
             Text(
@@ -183,7 +185,7 @@ fun SplashScreen(onTimeout: () -> Unit) {
                 modifier = Modifier.alpha(alpha)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
 
             // Tagline
             Text(
@@ -194,13 +196,13 @@ fun SplashScreen(onTimeout: () -> Unit) {
                 modifier = Modifier.alpha(alpha * textAlpha)
             )
 
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingExtraLarge() + AppDimensions.paddingLarge()))
 
             // Loading Progress Bar
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
+                    .fillMaxWidth(AppDimensions.splashProgressBarWidth())
                     .alpha(alpha)
             ) {
                 // Progress bar
@@ -208,13 +210,13 @@ fun SplashScreen(onTimeout: () -> Unit) {
                     progress = { loadingProgress },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(6.dp),
+                        .height(AppDimensions.paddingSmall()),
                     color = MaterialTheme.colorScheme.primary,
                     trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                     strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
                 // Loading text
                 Text(
@@ -230,7 +232,7 @@ fun SplashScreen(onTimeout: () -> Unit) {
                     modifier = Modifier.alpha(textAlpha)
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
 
                 // Percentage
                 Text(
@@ -240,11 +242,11 @@ fun SplashScreen(onTimeout: () -> Unit) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingExtraLarge()))
 
             // Animated loading dots
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingSmall()),
                 modifier = Modifier.alpha(alpha)
             ) {
                 repeat(3) { index ->
@@ -260,7 +262,7 @@ fun SplashScreen(onTimeout: () -> Unit) {
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 32.dp)
+                .padding(bottom = AppDimensions.paddingExtraLarge())
                 .alpha(alpha * 0.8f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -269,9 +271,9 @@ fun SplashScreen(onTimeout: () -> Unit) {
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingExtraSmall()))
             Text(
-                text = "v1.0.0",
+                text = "v${BuildConfig.VERSION_NAME}",
                 fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
             )
@@ -295,7 +297,7 @@ private fun LoadingDot(delay: Int, alpha: Float) {
 
     Box(
         modifier = Modifier
-            .size(8.dp)
+            .size(AppDimensions.paddingMedium())
             .scale(scale)
             .alpha(alpha)
             .background(MaterialTheme.colorScheme.primary, shape = CircleShape)

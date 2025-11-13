@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zynt.sumviltadconnect.ui.viewmodel.SettingsViewModel
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 
 @Composable
 fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
@@ -26,7 +27,7 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
     Column(
         Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(AppDimensions.paddingMedium())
     ) {
         Text(
             "Settings",
@@ -39,27 +40,27 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
             "Customize your app experience",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 24.dp)
+            modifier = Modifier.padding(bottom = AppDimensions.paddingLarge())
         )
 
         // Theme selection with enhanced UI
         Card(
             modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            shape = RoundedCornerShape(16.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingExtraSmall()),
+            shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
         ) {
-            Column(Modifier.padding(20.dp)) {
+            Column(Modifier.padding(AppDimensions.paddingLarge())) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = AppDimensions.paddingMedium())
                 ) {
                     Icon(
                         Icons.Default.Brightness6,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
                     )
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(AppDimensions.paddingMedium()))
                     Column {
                         Text(
                             "Theme",
@@ -84,7 +85,7 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
                     onClick = { vm.setTheme("light") }
                 )
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(AppDimensions.paddingSmall()))
 
                 ThemeOption(
                     title = "Dark Mode",
@@ -94,7 +95,7 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
                     onClick = { vm.setTheme("dark") }
                 )
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(AppDimensions.paddingSmall()))
 
                 ThemeOption(
                     title = "System Default",
@@ -106,22 +107,22 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
             }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(AppDimensions.paddingMedium()))
 
         // Notifications toggle with enhanced UI
         Card(
             modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            shape = RoundedCornerShape(16.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingExtraSmall()),
+            shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
         ) {
             Row(
-                Modifier.padding(20.dp),
+                Modifier.padding(AppDimensions.paddingLarge()),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .size(AppDimensions.buttonHeight())
+                        .clip(RoundedCornerShape(AppDimensions.cornerRadiusMedium()))
                         .background(
                             if (notificationsEnabled)
                                 MaterialTheme.colorScheme.primaryContainer
@@ -137,10 +138,10 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
                             MaterialTheme.colorScheme.primary
                         else
                             MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
                     )
                 }
-                Spacer(Modifier.width(16.dp))
+                Spacer(Modifier.width(AppDimensions.paddingMedium()))
                 Column(Modifier.weight(1f)) {
                     Text(
                         "Notifications",
@@ -185,13 +186,13 @@ private fun ThemeOption(
             else
                 MaterialTheme.colorScheme.surface
         ),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
         border = if (isSelected)
-            androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+            androidx.compose.foundation.BorderStroke(AppDimensions.paddingExtraSmall(), MaterialTheme.colorScheme.primary)
         else null
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(AppDimensions.paddingMedium()),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -201,9 +202,9 @@ private fun ThemeOption(
                     MaterialTheme.colorScheme.primary
                 else
                     MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(AppDimensions.iconSizeMedium())
             )
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(AppDimensions.paddingMedium()))
             Column(Modifier.weight(1f)) {
                 Text(
                     title,
@@ -228,7 +229,7 @@ private fun ThemeOption(
                     Icons.Default.CheckCircle,
                     contentDescription = "Selected",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(AppDimensions.iconSizeMedium())
                 )
             } else {
                 RadioButton(

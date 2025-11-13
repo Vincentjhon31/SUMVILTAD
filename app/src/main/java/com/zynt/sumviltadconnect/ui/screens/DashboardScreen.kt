@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Description
@@ -78,7 +79,7 @@ private fun AppIcon(modifier: Modifier = Modifier) {
         Image(
             bitmap = appIcon,
             contentDescription = "App Logo",
-            modifier = Modifier.size(80.dp).clip(CircleShape)
+            modifier = Modifier.size(AppDimensions.fabSize()).clip(CircleShape)
         )
     } else {
         // Fallback to Material Icon
@@ -123,7 +124,7 @@ fun DashboardScreen(
             .verticalScroll(rememberScrollState())
     ) {
         EnhancedHeader(userName = userName)
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
         when (state) {
             is DashboardUiState.Loading -> DashboardSkeleton()
@@ -144,7 +145,7 @@ fun DashboardScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(100.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.fabSize()))
     }
 }
 
@@ -153,9 +154,9 @@ private fun EnhancedHeader(userName: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = RoundedCornerShape(20.dp)
+            .padding(horizontal = AppDimensions.paddingMedium()),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingSmall()),
+        shape = RoundedCornerShape(AppDimensions.paddingLarge())
     ) {
         Box(
             modifier = Modifier
@@ -168,7 +169,7 @@ private fun EnhancedHeader(userName: String) {
                         )
                     )
                 )
-                .padding(24.dp)
+                .padding(AppDimensions.paddingLarge())
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -192,14 +193,14 @@ private fun EnhancedHeader(userName: String) {
 
                 Box(
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(AppDimensions.buttonHeight())
                         .background(Color.White.copy(alpha = 0.2f), CircleShape)
                         .clip(CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     // Using AppIcon helper that safely loads the icon
                     AppIcon(
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(AppDimensions.iconSizeLarge())
                     )
                 }
             }
@@ -215,7 +216,7 @@ private fun DashboardSkeleton() {
             Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(AppDimensions.paddingMedium()))
             Text("Loading dashboard...", style = MaterialTheme.typography.bodyMedium)
         }
     }
@@ -226,37 +227,37 @@ private fun EnhancedErrorState(message: String, onRetry: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(AppDimensions.paddingMedium()),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(AppDimensions.paddingLarge()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
                 Icons.Default.Error,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onErrorContainer,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(AppDimensions.iconSizeLarge())
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
             Text(
                 text = "Error loading dashboard",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
             Text(
                 text = message,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
             Button(
                 onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(
@@ -275,12 +276,12 @@ private fun EnhancedDashboardContent(
     isVisible: Boolean,
     onNavigate: (String) -> Unit
 ) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Column(modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium())) {
         Text(
             text = "Farm Overview",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = AppDimensions.paddingMedium())
         )
 
         // First Row - Staggered Animation
@@ -293,7 +294,7 @@ private fun EnhancedDashboardContent(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
             ) {
                 EnhancedStatCard(
                     title = "Total Analyses",
@@ -316,7 +317,7 @@ private fun EnhancedDashboardContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
         // Second Row - Staggered Animation
         AnimatedVisibility(
@@ -328,7 +329,7 @@ private fun EnhancedDashboardContent(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
             ) {
                 EnhancedStatCard(
                     title = "Pending Review",
@@ -351,7 +352,7 @@ private fun EnhancedDashboardContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
         // Disease Distribution Chart with Animation
         AnimatedVisibility(
@@ -366,7 +367,7 @@ private fun EnhancedDashboardContent(
                     text = "Disease Distribution",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    modifier = Modifier.padding(bottom = AppDimensions.paddingMedium())
                 )
                 EnhancedChartCard {
                     DiseaseDistributionBarChartVico(data.diseaseDistribution)
@@ -374,7 +375,7 @@ private fun EnhancedDashboardContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
         // Monthly Trend Chart with Animation
         AnimatedVisibility(
@@ -389,7 +390,7 @@ private fun EnhancedDashboardContent(
                     text = "Monthly Trend",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    modifier = Modifier.padding(bottom = AppDimensions.paddingMedium())
                 )
                 EnhancedChartCard {
                     MonthlyTrendLineChartVico(data.monthlyTrend)
@@ -397,7 +398,7 @@ private fun EnhancedDashboardContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
     }
 }
 
@@ -443,13 +444,13 @@ private fun EnhancedStatCard(
                 onClick()
                 isPressed = false
             },
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(AppDimensions.paddingMedium())) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -457,7 +458,7 @@ private fun EnhancedStatCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(AppDimensions.iconSizeLarge())
                         .background(
                             Brush.radialGradient(
                                 colors = listOf(
@@ -473,7 +474,7 @@ private fun EnhancedStatCard(
                         icon,
                         contentDescription = null,
                         tint = color,
-                        modifier = Modifier.size(26.dp)
+                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
                     )
                 }
 
@@ -485,7 +486,7 @@ private fun EnhancedStatCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
             Text(
                 text = title,
@@ -503,8 +504,8 @@ private fun EnhancedChartCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -512,7 +513,7 @@ private fun EnhancedChartCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(AppDimensions.paddingMedium())
         ) {
             content()
         }
@@ -590,7 +591,7 @@ private fun DiseaseDistributionBarChartVico(diseaseDistribution: Map<String, Int
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp)
+            .height(AppDimensions.detectionImageHeight())
     )
 }
 
@@ -732,7 +733,7 @@ private fun MonthlyTrendLineChartVico(monthlyTrend: List<Int>) {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(260.dp)
+            .height(AppDimensions.detectionImageHeight())
     )
 }
 
@@ -745,14 +746,14 @@ private fun EmptyChartState(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
-            .padding(24.dp),
+            .height(AppDimensions.detectionImageHeight())
+            .padding(AppDimensions.paddingLarge()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Box(
             modifier = Modifier
-                .size(64.dp)
+                .size(AppDimensions.buttonHeight())
                 .background(
                     MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
                     CircleShape
@@ -763,17 +764,17 @@ private fun EmptyChartState(
                 icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(AppDimensions.iconSizeMedium())
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
         Text(
             text = message,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingExtraSmall()))
         Text(
             text = description,
             fontSize = 12.sp,

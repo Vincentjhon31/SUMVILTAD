@@ -41,6 +41,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
 import androidx.navigation.NavController
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable

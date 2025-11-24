@@ -40,6 +40,8 @@ import kotlinx.coroutines.launch
 import androidx.navigation.NavBackStackEntry
 import androidx.core.content.ContextCompat
 import com.zynt.sumviltadconnect.ui.theme.AppDimensions
+import com.zynt.sumviltadconnect.utils.UpdateChecker
+import com.zynt.sumviltadconnect.ui.components.UpdateAvailableDialog
 
 // Helper function to safely load app icon
 @Composable
@@ -103,6 +105,19 @@ fun FarmerHomeScreen(rootNav: NavController, authViewModel: AuthViewModel) {
     
     // Create a shared ViewModel for CropHealth screens
     val cropHealthViewModel: CropHealthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    
+    // Update checker
+    var showUpdateDialog by remember { mutableStateOf(false) }
+    var availableUpdate by remember { mutableStateOf<com.zynt.sumviltadconnect.utils.AppVersion?>(null) }
+    
+    // Check for updates on app launch
+    LaunchedEffect(Unit) {
+        val update = UpdateChecker.checkForUpdates()
+        if (update?.isUpdateAvailable == true) {
+            availableUpdate = update
+            showUpdateDialog = true
+        }
+    }
 
     val drawerItems = listOf(
         HomeItem.Dashboard,
@@ -488,6 +503,14 @@ private fun EnhancedFAB(onClick: () -> Unit) {
                 fontWeight = FontWeight.Bold
             )
         }
+    }
+    
+    // Show update dialog if available
+    if (showUpdateDialog && availableUpdate != null) {
+        UpdateAvailableDialog(
+            appVersion = availableUpdate!!,
+            onDismiss = { showUpdateDialog = false }
+        )
     }
 }
 

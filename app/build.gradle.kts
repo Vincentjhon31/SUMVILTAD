@@ -33,6 +33,15 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("sumviltad-release.keystore")
+            storePassword = "sumviltad2025"
+            keyAlias = "sumviltad"
+            keyPassword = "sumviltad2025"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -40,9 +49,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Use debug signing config for testing/Firebase distribution
-            // For Play Store, create a proper release signing config
-            signingConfig = signingConfigs.getByName("debug")
+            // Use proper release signing for consistent updates
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

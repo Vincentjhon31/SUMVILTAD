@@ -32,15 +32,43 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease --no-daemon
-
       - name: Get version from tag
         id: get_version
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
+          # Extract version code from tag (e.g., v1.1.1 -> 111)
+          VERSION_CODE=$(echo $VERSION | tr -d '.')
+          echo "versionCode=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "Version Code: $VERSION_CODE"
+
+      - name: Update version in build.gradle.kts
+        run: |
+          VERSION=${{ steps.get_version.outputs.version }}
+          VERSION_CODE=${{ steps.get_version.outputs.versionCode }}
+
+          # Update versionName
+          sed -i "s/versionName = \".*\"/versionName = \"$VERSION\"/" app/build.gradle.kts
+
+          # Update versionCode
+          sed -i "s/versionCode = [0-9]*/versionCode = $VERSION_CODE/" app/build.gradle.kts
+
+          echo "✅ Updated build.gradle.kts:"
+          echo "  versionName = \"$VERSION\""
+          echo "  versionCode = $VERSION_CODE"
+
+          # Show the changes
+          grep -A 2 "versionCode = " app/build.gradle.kts
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Rename APK with version
+        run: |
+          VERSION=${{ steps.get_version.outputs.version }}
+          cp app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/SumviltadConnect_v${VERSION}.apk
+          echo "✅ Created: SumviltadConnect_v${VERSION}.apk"
 
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -79,7 +107,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: success()
         with:
-          files: app/build/outputs/apk/release/app-release.apk
+          files: app/build/outputs/apk/release/SumviltadConnect_v${{ steps.get_version.outputs.version }}.apk
           name: SUMVILTAD Connect v${{ steps.get_version.outputs.version }}
           body: |
             ## 🌾 SUMVILTAD Connect v${{ steps.get_version.outputs.version }}
@@ -88,7 +116,9 @@ jobs:
 
             ### 📥 Download & Installation
 
-            1. **Download APK**: Click the `app-release.apk` file below
+            > **💡 Tip**: If you're unsure what to download, just download the **`SumviltadConnect_v${{ steps.get_version.outputs.version }}.apk`** file below!
+
+            1. **Download APK**: Click the `SumviltadConnect_v${{ steps.get_version.outputs.version }}.apk` file below
             2. **Enable Installation**: Go to Settings → Security → Enable "Install from unknown sources"
             3. **Install**: Open the downloaded APK and tap "Install"
             4. **Done**: Launch SUMVILTAD Connect!
@@ -120,6 +150,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: app-release-v${{ steps.get_version.outputs.version }}
-          path: app/build/outputs/apk/release/app-release.apk
+          name: SumviltadConnect-v${{ steps.get_version.outputs.version }}
+          path: app/build/outputs/apk/release/SumviltadConnect_v${{ steps.get_version.outputs.version }}.apk
           retention-days: 90

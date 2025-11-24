@@ -104,14 +104,6 @@ fun FarmerHomeScreen(rootNav: NavController, authViewModel: AuthViewModel) {
     // Create a shared ViewModel for CropHealth screens
     val cropHealthViewModel: CropHealthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 
-    val bottomItems = listOf(
-        HomeItem.Dashboard,
-        HomeItem.CropHealth,
-        HomeItem.Irrigation,
-        HomeItem.Tasks,
-        HomeItem.Events
-    )
-
     val drawerItems = listOf(
         HomeItem.Dashboard,
         HomeItem.CropHealth,
@@ -153,12 +145,6 @@ fun FarmerHomeScreen(rootNav: NavController, authViewModel: AuthViewModel) {
             },
             floatingActionButton = {
                 EnhancedFAB(onClick = { rootNav.navigate("detection") })
-            },
-            bottomBar = {
-                EnhancedBottomNavigation(
-                    items = bottomItems,
-                    navController = nav
-                )
             }
         ) { paddingValues ->
             val enter: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
@@ -195,7 +181,13 @@ fun FarmerHomeScreen(rootNav: NavController, authViewModel: AuthViewModel) {
                 popExitTransition = popExit
             ) {
                 composable("dashboard") { DashboardScreen(rootNav) }
-                composable("cropHealth") { CropHealthScreen(nav, cropHealthViewModel) }
+                composable("cropHealth") { 
+                    CropHealthScreen(
+                        navController = nav, 
+                        vm = cropHealthViewModel,
+                        onNewDetection = { rootNav.navigate("detection") }
+                    ) 
+                }
                 
                 // Crop Health Detail Screen
                 composable(
@@ -499,78 +491,4 @@ private fun EnhancedFAB(onClick: () -> Unit) {
     }
 }
 
-@Composable
-private fun EnhancedBottomNavigation(
-    items: List<HomeItem>,
-    navController: NavController
-) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
 
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 8.dp
-    ) {
-        items.forEach { item ->
-            val isSelected = currentDestination?.hierarchy?.any { it.route == item.route } == true
-
-            NavigationBarItem(
-                icon = {
-                    AnimatedContent(
-                        targetState = isSelected,
-                        transitionSpec = {
-                            fadeIn(animationSpec = tween(180)) with fadeOut(animationSpec = tween(180))
-                        }, label = "bottomNavIcon"
-                    ) { selected ->
-                        if (selected) {
-                            Box(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .background(
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                        CircleShape
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    item.icon,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(AppDimensions.iconSizeSmall())
-                                )
-                            }
-                        } else {
-                            Icon(
-                                item.icon,
-                                contentDescription = null,
-                                modifier = Modifier.size(AppDimensions.iconSizeMedium())
-                            )
-                        }
-                    }
-                },
-                label = {
-                    Text(
-                        item.label.split(" ").first(), // Show only first word for space
-                        fontSize = 12.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                    )
-                },
-                selected = isSelected,
-                onClick = {
-                    navController.navigate(item.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    indicatorColor = Color.Transparent
-                )
-            )
-        }
-    }
-}

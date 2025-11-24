@@ -57,7 +57,11 @@ private val outputDateFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.get
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CropHealthScreen(navController: NavController? = null, vm: CropHealthViewModel = viewModel()) {
+fun CropHealthScreen(
+    navController: NavController? = null, 
+    vm: CropHealthViewModel = viewModel(),
+    onNewDetection: () -> Unit = {}
+) {
     val state by vm.state.collectAsState()
     var showDeleteDialog by remember { mutableStateOf<CropHealthRecord?>(null) }
     var showCommentsDialog by remember { mutableStateOf<CropHealthRecord?>(null) }
@@ -78,7 +82,7 @@ fun CropHealthScreen(navController: NavController? = null, vm: CropHealthViewMod
         // Enhanced Header
         EnhancedCropHealthHeader(
             onRefresh = { vm.refresh() },
-            onNewDetection = { navController?.navigate("detection") }
+            onNewDetection = onNewDetection
         )
 
         // Content
@@ -91,7 +95,7 @@ fun CropHealthScreen(navController: NavController? = null, vm: CropHealthViewMod
             is CropHealthUiState.Success -> {
                 val list = currentState.data
                 if (list.isEmpty()) {
-                    EnhancedEmptyState(onNewDetection = { navController?.navigate("detection") })
+                    EnhancedEmptyState(onNewDetection = onNewDetection)
                 } else {
                     EnhancedCropHealthList(
                         records = list,

@@ -200,6 +200,71 @@ class FarmerRepository(
         }
     }
 
+    // IRRIGATION REQUESTS
+    suspend fun submitIrrigationRequest(
+        location: String,
+        requestedDate: String,
+        reason: String?
+    ): IrrigationRequestResponse {
+        return try {
+            Log.d(TAG, "Submitting irrigation request for location: $location, date: $requestedDate")
+            val request = IrrigationRequestRequest(
+                location = location,
+                requestedDate = requestedDate,
+                reason = reason
+            )
+            val response = api.submitIrrigationRequest(request)
+            if (response.isSuccessful) {
+                Log.d(TAG, "Irrigation request submitted successfully")
+                response.body() ?: IrrigationRequestResponse(
+                    success = false,
+                    message = "Empty response from server"
+                )
+            } else {
+                Log.e(TAG, "Irrigation request API error: ${response.code()} - ${response.message()}")
+                IrrigationRequestResponse(
+                    success = false,
+                    message = response.message() ?: "Failed to submit request"
+                )
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Irrigation request API exception: ${e.message}", e)
+            IrrigationRequestResponse(
+                success = false,
+                message = "Network error: ${e.message}"
+            )
+        }
+    }
+
+    suspend fun getIrrigationRequests(): IrrigationRequestsResponse {
+        return try {
+            Log.d(TAG, "Fetching irrigation requests from: ${ApiClient.getBaseUrl()}api/irrigation-requests")
+            val response = api.getIrrigationRequests()
+            if (response.isSuccessful) {
+                Log.d(TAG, "Irrigation requests API success")
+                response.body() ?: IrrigationRequestsResponse(
+                    success = false,
+                    message = "Empty response",
+                    data = emptyList()
+                )
+            } else {
+                Log.e(TAG, "Irrigation requests API error: ${response.code()} - ${response.message()}")
+                IrrigationRequestsResponse(
+                    success = false,
+                    message = "Failed to fetch requests",
+                    data = emptyList()
+                )
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Irrigation requests API exception: ${e.message}", e)
+            IrrigationRequestsResponse(
+                success = false,
+                message = "Network error",
+                data = emptyList()
+            )
+        }
+    }
+
     // EVENT PARTICIPATION
     suspend fun participateInEvent(eventId: Int, status: String) {
         try {

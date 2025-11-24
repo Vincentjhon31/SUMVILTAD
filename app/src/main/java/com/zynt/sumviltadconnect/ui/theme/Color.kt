@@ -2,16 +2,40 @@ package com.zynt.sumviltadconnect.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Gray Green Palette - Primary Color: #5f9373
-val GrayGreen80 = Color(0xFF9FC5B0)  // Lighter shade for dark theme
-val GrayGreenLight80 = Color(0xFFB8D4C3)
-val GrayGreenAccent80 = Color(0xFFA8CDB8)
+// Modern Green Palette (Emerald Inspired)
+val ModernGreenPrimary = Color(0xFF059669) // Emerald 600
+val ModernGreenSecondary = Color(0xFF10B981) // Emerald 500
+val ModernGreenTertiary = Color(0xFF34D399) // Emerald 400
 
-val GrayGreen40 = Color(0xFF5f9373)  // Main Gray Green color
-val GrayGreenDark40 = Color(0xFF4A7259)  // Darker shade
-val GrayGreenAccent40 = Color(0xFF6FA583)  // Accent shade
+// Dark Theme Colors
+val ModernGreenPrimary80 = Color(0xFF6EE7B7) // Emerald 300
+val ModernGreenSecondary80 = Color(0xFF34D399) // Emerald 400
+val ModernGreenTertiary80 = Color(0xFF10B981) // Emerald 500
 
-// Additional complementary colors
+// Backgrounds & Surfaces
+val ModernGreenBackgroundLight = Color(0xFFF0FDF4) // Emerald 50
+val ModernGreenSurfaceLight = Color(0xFFFFFFFF)
+
+val ModernGreenBackgroundDark = Color(0xFF022C22) // Emerald 950
+val ModernGreenSurfaceDark = Color(0xFF064E3B) // Emerald 900
+
+// Containers
+val ModernGreenContainerLight = Color(0xFFD1FAE5) // Emerald 100
+val ModernGreenOnContainerLight = Color(0xFF064E3B) // Emerald 900
+
+val ModernGreenContainerDark = Color(0xFF065F46) // Emerald 800
+val ModernGreenOnContainerDark = Color(0xFFD1FAE5) // Emerald 100
+
+// Text/Content Colors
+val OnGreenPrimary = Color.White
+val OnGreenSecondary = Color.White
+val OnGreenBackgroundLight = Color(0xFF064E3B) // Emerald 900
+val OnGreenSurfaceLight = Color(0xFF064E3B) // Emerald 900
+
+val OnGreenBackgroundDark = Color(0xFFECFDF5) // Emerald 50
+val OnGreenSurfaceDark = Color(0xFFECFDF5) // Emerald 50
+
+// Legacy/Fallback (Optional, keeping for reference if needed, but can be removed)
 val SoftWhite = Color(0xFFF8FAF9)
 val DarkGreen = Color(0xFF3A5A47)
 val LightGreen = Color(0xFFE8F3ED)

@@ -71,8 +71,26 @@ class IrrigationViewModel(app: Application) : AndroidViewModel(app) {
     private var _allUpcomingSchedules = listOf<IrrigationSchedule>()
     private var _allPastSchedules = listOf<IrrigationSchedule>()
 
+    // Irrigation request state
+    private val _isSubmittingRequest = MutableStateFlow(false)
+    val isSubmittingRequest: StateFlow<Boolean> = _isSubmittingRequest.asStateFlow()
+
+    private val _requestSubmitSuccess = MutableStateFlow<String?>(null)
+    val requestSubmitSuccess: StateFlow<String?> = _requestSubmitSuccess.asStateFlow()
+
+    private val _requestSubmitError = MutableStateFlow<String?>(null)
+    val requestSubmitError: StateFlow<String?> = _requestSubmitError.asStateFlow()
+
+    // My requests state
+    private val _myRequests = MutableStateFlow<List<com.zynt.sumviltadconnect.data.model.IrrigationRequest>>(emptyList())
+    val myRequests: StateFlow<List<com.zynt.sumviltadconnect.data.model.IrrigationRequest>> = _myRequests.asStateFlow()
+
+    private val _isLoadingRequests = MutableStateFlow(false)
+    val isLoadingRequests: StateFlow<Boolean> = _isLoadingRequests.asStateFlow()
+
     init {
         loadIrrigationSchedules()
+        loadMyRequests()
     }
 
     fun loadIrrigationSchedules() {
@@ -240,6 +258,63 @@ class IrrigationViewModel(app: Application) : AndroidViewModel(app) {
         } catch (e: Exception) {
             Log.e("IrrigationViewModel", "Error checking if date is today: $dateString", e)
             false
+        }
+    }
+
+    fun submitIrrigationRequest(location: String, requestedDate: String, reason: String?) {
+        viewModelScope.launch {
+            _isSubmittingRequest.value = true
+            _requestSubmitError.value = null
+            _requestSubmitSuccess.value = null
+
+            try {
+                Log.d("IrrigationViewModel", "Submitting irrigation request: location=$location, date=$requestedDate")
+                val response = repository.submitIrrigationRequest(location, requestedDate, reason)
+
+                if (response.success) {
+                    _requestSubmitSuccess.value = response.message
+                    Log.d("IrrigationViewModel", "Irrigation request submitted successfully")
+                    // Refresh schedules and requests
+                    loadIrrigationSchedules()
+                    loadMyRequests()
+                } else {
+                    _requestSubmitError.value = response.message
+                    Log.e("IrrigationViewModel", "Failed to submit irrigation request: ${response.message}")
+                }
+            } catch (e: Exception) {
+                _requestSubmitError.value = "Failed to submit request: ${e.message}"
+                Log.e("IrrigationViewModel", "Exception submitting irrigation request", e)
+            } finally {
+                _isSubmittingRequest.value = false
+            }
+        }
+    }
+
+    fun clearRequestMessages() {
+        _requestSubmitSuccess.value = null
+        _requestSubmitError.value = null
+    }
+
+    fun loadMyRequests() {
+        viewModelScope.launch {
+            _isLoadingRequests.value = true
+            try {
+                Log.d("IrrigationViewModel", "Loading my irrigation requests")
+                val response = repository.getIrrigationRequests()
+
+                if (response.success && response.data != null) {
+                    _myRequests.value = response.data
+                    Log.d("IrrigationViewModel", "Loaded ${response.data.size} irrigation requests")
+                } else {
+                    Log.e("IrrigationViewModel", "Failed to load requests: ${response.message}")
+                    _myRequests.value = emptyList()
+                }
+            } catch (e: Exception) {
+                Log.e("IrrigationViewModel", "Exception loading irrigation requests", e)
+                _myRequests.value = emptyList()
+            } finally {
+                _isLoadingRequests.value = false
+            }
         }
     }
 }

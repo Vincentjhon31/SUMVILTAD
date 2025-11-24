@@ -96,6 +96,13 @@ interface ApiService {
     @GET("api/irrigation-schedules")
     suspend fun getIrrigationSchedules(): Response<IrrigationSchedulesResponse>
 
+    // Irrigation request endpoints
+    @POST("api/irrigation-requests")
+    suspend fun submitIrrigationRequest(@Body request: IrrigationRequestRequest): Response<IrrigationRequestResponse>
+
+    @GET("api/irrigation-requests")
+    suspend fun getIrrigationRequests(): Response<IrrigationRequestsResponse>
+
     // Crop Health / Disease Detection endpoints - Fixed to match existing models
     @GET("api/crop-health")
     suspend fun getCropHealthReports(): Response<CropHealthResponse>

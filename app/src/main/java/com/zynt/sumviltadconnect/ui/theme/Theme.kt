@@ -20,37 +20,37 @@ import androidx.core.view.WindowCompat
 import com.zynt.sumviltadconnect.data.local.SettingsStore
 
 private val DarkColorScheme = darkColorScheme(
-    primary = GrayGreen80,
-    secondary = GrayGreenLight80,
-    tertiary = GrayGreenAccent80,
-    background = Color(0xFF1A1C1A),
-    surface = Color(0xFF1F1F1F),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFFE8E8E8),
-    onSurface = Color(0xFFE8E8E8),
-    primaryContainer = GrayGreenDark40,
-    onPrimaryContainer = GrayGreen80,
-    surfaceVariant = Color(0xFF2A2A2A),
-    onSurfaceVariant = Color(0xFFD0D0D0)
+    primary = ModernGreenPrimary80,
+    secondary = ModernGreenSecondary80,
+    tertiary = ModernGreenTertiary80,
+    background = ModernGreenBackgroundDark,
+    surface = ModernGreenSurfaceDark,
+    onPrimary = ModernGreenBackgroundDark,
+    onSecondary = ModernGreenBackgroundDark,
+    onTertiary = ModernGreenBackgroundDark,
+    onBackground = OnGreenBackgroundDark,
+    onSurface = OnGreenSurfaceDark,
+    primaryContainer = ModernGreenContainerDark,
+    onPrimaryContainer = ModernGreenOnContainerDark,
+    surfaceVariant = ModernGreenContainerDark,
+    onSurfaceVariant = ModernGreenOnContainerDark
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = GrayGreen40,
-    secondary = GrayGreenDark40,
-    tertiary = GrayGreenAccent40,
-    background = SoftWhite,
-    surface = Color.White,
+    primary = ModernGreenPrimary,
+    secondary = ModernGreenSecondary,
+    tertiary = ModernGreenTertiary,
+    background = ModernGreenBackgroundLight,
+    surface = ModernGreenSurfaceLight,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    primaryContainer = LightGreen,
-    onPrimaryContainer = DarkGreen,
-    surfaceVariant = LightGreen,
-    onSurfaceVariant = DarkGreen
+    onBackground = OnGreenBackgroundLight,
+    onSurface = OnGreenSurfaceLight,
+    primaryContainer = ModernGreenContainerLight,
+    onPrimaryContainer = ModernGreenOnContainerLight,
+    surfaceVariant = ModernGreenContainerLight,
+    onSurfaceVariant = ModernGreenOnContainerLight
 )
 
 @Composable

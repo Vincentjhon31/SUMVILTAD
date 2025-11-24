@@ -297,7 +297,7 @@ private fun EnhancedDashboardContent(
                 horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
             ) {
                 EnhancedStatCard(
-                    title = "Total Analyses",
+                    title = "Total Analysis",
                     value = data.totalAnalyses,
                     icon = Icons.Default.Analytics,
                     color = Color(0xFF4CAF50),

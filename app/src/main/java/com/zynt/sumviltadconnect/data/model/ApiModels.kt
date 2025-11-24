@@ -292,6 +292,40 @@ data class IrrigationSchedulesResponse(
     val success: Boolean? = null
 )
 
+// Irrigation Request Models
+data class IrrigationRequest(
+    val id: Int,
+    val location: String,
+    @SerializedName("requested_date")
+    val requestedDate: String,
+    val reason: String?,
+    val status: String,
+    @SerializedName("created_at")
+    val createdAt: String,
+    @SerializedName("updated_at")
+    val updatedAt: String
+)
+
+data class IrrigationRequestRequest(
+    val location: String,
+    @SerializedName("requested_date")
+    val requestedDate: String,
+    val reason: String?
+)
+
+data class IrrigationRequestResponse(
+    val success: Boolean,
+    val message: String,
+    val data: IrrigationRequest? = null,
+    val errors: Map<String, List<String>>? = null
+)
+
+data class IrrigationRequestsResponse(
+    val success: Boolean,
+    val message: String,
+    val data: List<IrrigationRequest>
+)
+
 // Crop Health Models - Fixed to match existing CropHealthRecord structure
 data class CropHealthRecord(
     val id: Int,

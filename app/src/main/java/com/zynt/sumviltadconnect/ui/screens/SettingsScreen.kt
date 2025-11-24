@@ -78,7 +78,7 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
 
                 // Theme options with better visual design
                 ThemeOption(
-                    title = "Light (Gray Green)",
+                    title = "Light Mode (Emerald Green)",
                     subtitle = "Clean and bright interface",
                     icon = Icons.Default.LightMode,
                     isSelected = currentTheme == "light",

@@ -76,7 +76,7 @@ jobs:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           groups: testers
-          file: app/build/outputs/apk/release/app-release.apk
+          file: app/build/outputs/apk/release/SumviltadConnect_v${{ steps.get_version.outputs.version }}.apk
           releaseNotes: |
             🌾 SUMVILTAD Connect v${{ steps.get_version.outputs.version }}
 

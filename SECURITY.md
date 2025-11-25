@@ -132,9 +132,59 @@ Please provide the following information in your report:
    - Implement API key authentication for production
 
 4. **APK Distribution**:
+
    - GitHub Releases for public distribution
    - Firebase App Distribution for testing groups
    - Proper code signing with release keystore (v1.1.2+)
+
+5. **Google Services Configuration**:
+   - `google-services.json` excluded from Git (`.gitignore`)
+   - Contains Firebase API keys and configuration
+   - **Action Required**: If you see leaked API key alerts, follow remediation steps below
+   - Template file provided: `google-services.json.example`
+
+## Remediation for Leaked API Keys
+
+### If GitHub Detects Leaked Google API Keys
+
+**Immediate Actions:**
+
+1. **Rotate/Regenerate the API Key**:
+
+   - Go to [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** → **Credentials**
+   - Find the compromised API key
+   - Click **Regenerate Key** or delete and create new one
+   - Download new `google-services.json` from Firebase Console
+
+2. **Revoke Access**:
+
+   - In Google Cloud Console, restrict the API key:
+     - **Application restrictions**: Android apps only
+     - **API restrictions**: Limit to Firebase services only
+     - **Referrer restrictions**: Add package name `com.zynt.sumviltadconnect`
+
+3. **Check for Unauthorized Access**:
+
+   - Firebase Console → **Usage and billing** → **Usage**
+   - Look for suspicious activity or unexpected spikes
+   - Check **Firebase Authentication** → **Users** for unauthorized accounts
+
+4. **Update Local Configuration**:
+
+   - Replace `app/google-services.json` with new file (don't commit!)
+   - Verify `.gitignore` includes `google-services.json`
+   - Test app to ensure Firebase services still work
+
+5. **Close GitHub Security Alert**:
+
+   - Go to repository **Security** tab → **Secret scanning**
+   - Mark alert as **Revoked** after rotating key
+   - Add comment explaining remediation steps taken
+
+6. **Prevent Future Leaks**:
+   - Never commit `google-services.json` to any branch
+   - Use `google-services.json.example` as template for team
+   - Review all team members' local `.gitignore` setup
 
 ### Recommended Security Enhancements
 

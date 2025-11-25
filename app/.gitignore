@@ -91,6 +91,10 @@ __pycache__/
 *.dylib
 site-packages/torch/
 
+# Firebase Configuration - Contains API Keys (DO NOT COMMIT!)
+google-services.json
+google-services*.json
+
 # Temporary and cache files
 *.tmp
 *.temp

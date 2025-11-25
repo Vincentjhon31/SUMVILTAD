@@ -249,6 +249,14 @@ fun FarmerHomeScreen(rootNav: NavController, authViewModel: AuthViewModel) {
                 composable("settings") { SettingsScreen() }
             }
         }
+        
+        // Show update dialog if available
+        if (showUpdateDialog && availableUpdate != null) {
+            UpdateAvailableDialog(
+                appVersion = availableUpdate!!,
+                onDismiss = { showUpdateDialog = false }
+            )
+        }
     }
 }
 
@@ -503,14 +511,6 @@ private fun EnhancedFAB(onClick: () -> Unit) {
                 fontWeight = FontWeight.Bold
             )
         }
-    }
-    
-    // Show update dialog if available
-    if (showUpdateDialog && availableUpdate != null) {
-        UpdateAvailableDialog(
-            appVersion = availableUpdate!!,
-            onDismiss = { showUpdateDialog = false }
-        )
     }
 }
 

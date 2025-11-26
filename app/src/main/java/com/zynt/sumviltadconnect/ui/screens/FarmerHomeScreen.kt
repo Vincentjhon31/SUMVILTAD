@@ -7,8 +7,10 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -269,108 +271,114 @@ private fun EnhancedDrawerContent(
     ModalDrawerSheet(
         modifier = Modifier.width(AppDimensions.drawerWidth())
     ) {
-        // Header with gradient - Using custom app icon
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(AppDimensions.drawerHeaderHeight())
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.primaryContainer
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            // Header with gradient - Using custom app icon
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(AppDimensions.drawerHeaderHeight())
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primaryContainer
+                            )
                         )
                     )
-                )
-                .padding(AppDimensions.paddingLarge()),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Column {
-                Box(
-                    modifier = Modifier
-                        .size(AppDimensions.drawerLogoSize())
-                        .background(
-                            Color.White.copy(alpha = 0.2f),
-                            CircleShape
-                        )
-                        .clip(CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    // Using Image instead of Icon to support adaptive icons
-                    AppIcon(
+                    .padding(AppDimensions.paddingLarge()),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Column {
+                    Box(
                         modifier = Modifier
-                            .size(AppDimensions.logoSizeSmall())
-                            .clip(CircleShape)
+                            .size(AppDimensions.drawerLogoSize())
+                            .background(
+                                Color.White.copy(alpha = 0.2f),
+                                CircleShape
+                            )
+                            .clip(CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        // Using Image instead of Icon to support adaptive icons
+                        AppIcon(
+                            modifier = Modifier
+                                .size(AppDimensions.logoSizeSmall())
+                                .clip(CircleShape)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+
+                    Text(
+                        text = "SumviltadConnect",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Smart Rice Farming",
+                        fontSize = 14.sp,
+                        color = Color.White.copy(alpha = 0.8f)
                     )
                 }
+            }
 
-                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
-                Text(
-                    text = "SumviltadConnect",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = "Smart Rice Farming",
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
+            // Navigation items
+            items.forEach { item ->
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            item.icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(AppDimensions.iconSizeMedium())
+                        )
+                    },
+                    label = {
+                        Text(
+                            item.label,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    },
+                    selected = false,
+                    onClick = { onSelect(item) },
+                    modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingExtraSmall()),
+                    shape = RoundedCornerShape(AppDimensions.cornerRadiusSmall())
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
-        // Navigation items
-        items.forEach { item ->
+            // Logout button
             NavigationDrawerItem(
                 icon = {
                     Icon(
-                        item.icon,
+                        Icons.Default.ExitToApp,
                         contentDescription = null,
-                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
+                        tint = MaterialTheme.colorScheme.error
                     )
                 },
                 label = {
                     Text(
-                        item.label,
-                        fontSize = 16.sp,
+                        "Logout",
+                        color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.Medium
                     )
                 },
                 selected = false,
-                onClick = { onSelect(item) },
-                modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingExtraSmall()),
+                onClick = onLogout,
+                modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingSmall()),
                 shape = RoundedCornerShape(AppDimensions.cornerRadiusSmall())
             )
+
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
         }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Logout button
-        NavigationDrawerItem(
-            icon = {
-                Icon(
-                    Icons.Default.ExitToApp,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error
-                )
-            },
-            label = {
-                Text(
-                    "Logout",
-                    color = MaterialTheme.colorScheme.error,
-                    fontWeight = FontWeight.Medium
-                )
-            },
-            selected = false,
-            onClick = onLogout,
-            modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingSmall()),
-            shape = RoundedCornerShape(AppDimensions.cornerRadiusSmall())
-        )
-
-        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
     }
 }
 
@@ -499,7 +507,7 @@ private fun EnhancedFAB(onClick: () -> Unit) {
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+            ) {
             Icon(
                 Icons.Default.BugReport,
                 contentDescription = "Detect Disease",

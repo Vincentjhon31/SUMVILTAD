@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import com.zynt.sumviltadconnect.ui.theme.AppDimensions
+import com.zynt.sumviltadconnect.ui.theme.WindowSize
+import com.zynt.sumviltadconnect.ui.theme.rememberWindowSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,6 +41,7 @@ fun IrrigationScheduleScreen(
     val pastSchedules by viewModel.pastSchedules.collectAsState()
     val nextIrrigation by viewModel.nextIrrigation.collectAsState()
     val state by viewModel.state.collectAsState()
+    val windowSize = rememberWindowSize()
 
     // Pagination state
     val upcomingCurrentPage by viewModel.upcomingCurrentPage.collectAsState()
@@ -145,36 +148,79 @@ fun IrrigationScheduleScreen(
                 }
             }
 
-            // Upcoming Irrigation Section
-            item {
-                UpcomingIrrigationSection(
-                    schedules = upcomingSchedules,
-                    viewModel = viewModel
-                )
-            }
-
-            // Past Irrigation History Section
-            if (pastSchedules.isNotEmpty()) {
+            // Responsive Layout
+            if (windowSize == WindowSize.EXPANDED) {
                 item {
-                    PastIrrigationSection(
-                        schedules = pastSchedules,
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium()),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        // Left Column: Schedules
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
+                        ) {
+                            UpcomingIrrigationSection(
+                                schedules = upcomingSchedules,
+                                viewModel = viewModel
+                            )
+                            
+                            if (pastSchedules.isNotEmpty()) {
+                                PastIrrigationSection(
+                                    schedules = pastSchedules,
+                                    viewModel = viewModel
+                                )
+                            }
+                        }
+                        
+                        // Right Column: Requests & Info
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
+                        ) {
+                            MyRequestsSection(
+                                requests = myRequests,
+                                isLoading = isLoadingRequests,
+                                onRefresh = { viewModel.loadMyRequests() }
+                            )
+                            
+                            InfoCard()
+                        }
+                    }
+                }
+            } else {
+                // Upcoming Irrigation Section
+                item {
+                    UpcomingIrrigationSection(
+                        schedules = upcomingSchedules,
                         viewModel = viewModel
                     )
                 }
-            }
 
-            // My Requests Section
-            item {
-                MyRequestsSection(
-                    requests = myRequests,
-                    isLoading = isLoadingRequests,
-                    onRefresh = { viewModel.loadMyRequests() }
-                )
-            }
+                // Past Irrigation History Section
+                if (pastSchedules.isNotEmpty()) {
+                    item {
+                        PastIrrigationSection(
+                            schedules = pastSchedules,
+                            viewModel = viewModel
+                        )
+                    }
+                }
 
-            // Info Card
-            item {
-                InfoCard()
+                // My Requests Section
+                item {
+                    MyRequestsSection(
+                        requests = myRequests,
+                        isLoading = isLoadingRequests,
+                        onRefresh = { viewModel.loadMyRequests() }
+                    )
+                }
+
+                // Info Card
+                item {
+                    InfoCard()
+                }
             }
         }
     }

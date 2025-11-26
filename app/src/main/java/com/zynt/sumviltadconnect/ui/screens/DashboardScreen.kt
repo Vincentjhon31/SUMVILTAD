@@ -1,11 +1,13 @@
 package com.zynt.sumviltadconnect.ui.screens
 
-import android.graphics.Color as AndroidColor
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -19,37 +21,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.zynt.sumviltadconnect.ui.theme.AppDimensions
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.Description
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.data.Entry
 import com.zynt.sumviltadconnect.R
 import com.zynt.sumviltadconnect.data.model.DashboardSummary
 import com.zynt.sumviltadconnect.ui.components.FullScreenSkeleton
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 import com.zynt.sumviltadconnect.ui.viewmodel.DashboardUiState
 import com.zynt.sumviltadconnect.ui.viewmodel.DashboardViewModel
 import com.zynt.sumviltadconnect.utils.TokenManager
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 // Helper function to safely load app icon
 @Composable
@@ -284,6 +284,13 @@ private fun EnhancedDashboardContent(
             modifier = Modifier.padding(bottom = AppDimensions.paddingMedium())
         )
 
+        OverviewQuickStatsRow(
+            pendingTasks = data.pendingTasks,
+            upcomingEvents = data.upcomingEvents
+        )
+
+        Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
+
         // First Row - Staggered Animation
         AnimatedVisibility(
             visible = isVisible,
@@ -301,6 +308,7 @@ private fun EnhancedDashboardContent(
                     value = data.totalAnalyses,
                     icon = Icons.Default.Analytics,
                     color = Color(0xFF4CAF50),
+                    supportingText = "Reports logged",
                     modifier = Modifier.weight(1f),
                     onClick = {},
                     animationDelay = 0
@@ -310,6 +318,7 @@ private fun EnhancedDashboardContent(
                     value = data.expertReviewed,
                     icon = Icons.Default.Verified,
                     color = Color(0xFF2196F3),
+                    supportingText = "Validated cases",
                     modifier = Modifier.weight(1f),
                     onClick = {},
                     animationDelay = 100
@@ -336,6 +345,7 @@ private fun EnhancedDashboardContent(
                     value = data.pendingReview,
                     icon = Icons.Default.Pending,
                     color = Color(0xFFFF9800),
+                    supportingText = "Awaiting expert check",
                     modifier = Modifier.weight(1f),
                     onClick = {},
                     animationDelay = 200
@@ -345,6 +355,9 @@ private fun EnhancedDashboardContent(
                     value = data.taskProgress,
                     icon = Icons.Default.AssignmentTurnedIn,
                     color = Color(0xFF9C27B0),
+                    supportingText = "Field plan status",
+                    valueSuffix = "%",
+                    progressFraction = data.taskProgress.coerceIn(0, 100) / 100f,
                     modifier = Modifier.weight(1f),
                     onClick = {},
                     animationDelay = 300
@@ -402,6 +415,83 @@ private fun EnhancedDashboardContent(
     }
 }
 
+private data class QuickStat(
+    val icon: ImageVector,
+    val value: Int,
+    val label: String,
+    val accent: Color
+)
+
+@Composable
+private fun OverviewQuickStatsRow(
+    pendingTasks: Int,
+    upcomingEvents: Int
+) {
+    val quickStats = listOf(
+        QuickStat(Icons.Default.EventAvailable, upcomingEvents, "Upcoming events", Color(0xFF2E7D32)),
+        QuickStat(Icons.Default.TaskAlt, pendingTasks, "Pending tasks", Color(0xFFEF6C00))
+    )
+
+    val scrollState = rememberScrollState()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(scrollState),
+        horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingSmall())
+    ) {
+        quickStats.forEach { stat ->
+            OverviewQuickStatChip(
+                icon = stat.icon,
+                value = stat.value,
+                label = stat.label,
+                accent = stat.accent
+            )
+        }
+    }
+}
+
+@Composable
+private fun OverviewQuickStatChip(
+    icon: ImageVector,
+    value: Int,
+    label: String,
+    accent: Color
+) {
+    Surface(
+        border = BorderStroke(1.dp, accent.copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(32.dp),
+        color = accent.copy(alpha = 0.08f)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = AppDimensions.paddingMedium(), vertical = AppDimensions.paddingSmall()),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingSmall())
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = accent,
+                modifier = Modifier.size(AppDimensions.iconSizeMedium())
+            )
+            Column {
+                Text(
+                    text = value.toString(),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = label,
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun EnhancedStatCard(
     title: String,
@@ -410,7 +500,10 @@ private fun EnhancedStatCard(
     color: Color,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    animationDelay: Int = 0
+    animationDelay: Int = 0,
+    supportingText: String? = null,
+    valueSuffix: String? = null,
+    progressFraction: Float? = null
 ) {
     var isPressed by remember { mutableStateOf(false) }
     var isVisible by remember { mutableStateOf(false) }
@@ -450,7 +543,20 @@ private fun EnhancedStatCard(
             containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
-        Column(modifier = Modifier.padding(AppDimensions.paddingMedium())) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(AppDimensions.cornerRadiusMedium()))
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            color.copy(alpha = 0.18f),
+                            color.copy(alpha = 0.04f)
+                        )
+                    )
+                )
+                .padding(AppDimensions.paddingMedium())
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -479,7 +585,7 @@ private fun EnhancedStatCard(
                 }
 
                 Text(
-                    text = value.toString(),
+                    text = valueSuffix?.let { "$value$it" } ?: value.toString(),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -494,6 +600,25 @@ private fun EnhancedStatCard(
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            supportingText?.let {
+                Spacer(modifier = Modifier.height(AppDimensions.paddingExtraSmall()))
+                Text(
+                    text = it,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                )
+            }
+
+            progressFraction?.let { fraction ->
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+                LinearProgressIndicator(
+                    progress = fraction.coerceIn(0f, 1f),
+                    trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                    color = color,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }
@@ -531,68 +656,95 @@ private fun DiseaseDistributionBarChartVico(diseaseDistribution: Map<String, Int
         return
     }
 
-    // Get theme-aware colors that update with theme changes
-    val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
-    val textColor = onSurfaceColor.toArgb()
-    val axisColor = if (isDarkTheme) AndroidColor.LTGRAY else AndroidColor.DKGRAY
-    val gridColor = if (isDarkTheme) AndroidColor.rgb(80, 80, 80) else AndroidColor.LTGRAY
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val onSurface = MaterialTheme.colorScheme.onSurface
 
-    val entries = remember(diseaseDistribution) {
-        diseaseDistribution.entries.mapIndexed { idx: Int, entry: Map.Entry<String, Int> ->
-            BarEntry(idx.toFloat(), entry.value.toFloat())
-        }
-    }
-    val labels = remember(diseaseDistribution) {
-        diseaseDistribution.keys.toList()
-    }
+    var animationPlayed by remember { mutableStateOf(false) }
+    val progress by animateFloatAsState(
+        targetValue = if (animationPlayed) 1f else 0f,
+        animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing),
+        label = "barHeight"
+    )
+    LaunchedEffect(Unit) { animationPlayed = true }
 
-    AndroidView(
-        factory = { context ->
-            BarChart(context).apply {
-                val dataSet = BarDataSet(entries, "Disease Distribution")
-                dataSet.color = AndroidColor.rgb(76, 175, 80)
-                dataSet.valueTextColor = textColor
-                dataSet.valueTextSize = 11f
-                val barData = BarData(dataSet)
-                this.data = barData
-                this.setFitBars(true)
-                this.setDrawValueAboveBar(true)
-                this.axisLeft.axisMinimum = 0f
-                this.axisLeft.setTextColor(axisColor)
-                this.axisLeft.setGridColor(gridColor)
-                this.axisRight.isEnabled = false
-                this.xAxis.valueFormatter = com.github.mikephil.charting.formatter.IndexAxisValueFormatter(labels)
-                this.xAxis.granularity = 1f
-                this.xAxis.setDrawGridLines(false)
-                this.xAxis.labelRotationAngle = -45f
-                this.xAxis.textSize = 10f
-                this.xAxis.setTextColor(axisColor)
-                this.description = Description().apply { text = "" }
-                this.legend.isEnabled = false
+    val maxValue = remember(diseaseDistribution) { diseaseDistribution.values.maxOrNull() ?: 0 }
+    val labels = remember(diseaseDistribution) { diseaseDistribution.keys.toList() }
+    val values = remember(diseaseDistribution) { diseaseDistribution.values.toList() }
 
-                // Set background transparent
-                this.setBackgroundColor(AndroidColor.TRANSPARENT)
-
-                // Animate the chart
-                this.animateY(800, com.github.mikephil.charting.animation.Easing.EaseInOutQuad)
-
-                this.invalidate()
-            }
-        },
-        update = { chart ->
-            // Update colors when theme changes
-            val dataSet = chart.data?.getDataSetByIndex(0) as? BarDataSet
-            dataSet?.valueTextColor = textColor
-            chart.xAxis.setTextColor(axisColor)
-            chart.axisLeft.setTextColor(axisColor)
-            chart.axisLeft.setGridColor(gridColor)
-            chart.invalidate()
-        },
+    Canvas(
         modifier = Modifier
             .fillMaxWidth()
             .height(AppDimensions.detectionImageHeight())
-    )
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        val barSpacing = size.width / (labels.size * 2f)
+        val barWidth = barSpacing * 0.85f
+        val chartBottom = size.height - 36.dp.toPx()
+        val maxBarHeight = chartBottom - 20.dp.toPx()
+
+        labels.forEachIndexed { index, label ->
+            val value = values[index]
+            val normalizedHeight = if (maxValue > 0) value / maxValue.toFloat() else 0f
+            val barHeight = maxBarHeight * normalizedHeight * progress
+
+            val x = (index * (barWidth + barSpacing)) + barSpacing / 2
+            val topY = chartBottom - barHeight
+
+            // Draw subtle background track
+            drawRoundRect(
+                color = primaryColor.copy(alpha = 0.08f),
+                topLeft = Offset(x, chartBottom - maxBarHeight),
+                size = Size(barWidth, maxBarHeight),
+                cornerRadius = CornerRadius(10.dp.toPx())
+            )
+
+            // Draw animated bar
+            drawRoundRect(
+                brush = Brush.verticalGradient(
+                    colors = listOf(primaryColor, primaryColor.copy(alpha = 0.55f)),
+                    startY = topY,
+                    endY = chartBottom
+                ),
+                topLeft = Offset(x, topY),
+                size = Size(barWidth, barHeight),
+                cornerRadius = CornerRadius(10.dp.toPx())
+            )
+
+            // Value label
+            drawContext.canvas.nativeCanvas.apply {
+                drawText(
+                    value.toString(),
+                    x + barWidth / 2,
+                    topY - 6.dp.toPx(),
+                    android.graphics.Paint().apply {
+                        color = onSurface.toArgb()
+                        textSize = 12.sp.toPx()
+                        textAlign = android.graphics.Paint.Align.CENTER
+                        isAntiAlias = true
+                        isFakeBoldText = true
+                    }
+                )
+            }
+
+            // Rotated x-axis label for readability
+            drawContext.canvas.nativeCanvas.apply {
+                save()
+                rotate(-35f, x + barWidth / 2, size.height - 8.dp.toPx())
+                drawText(
+                    label,
+                    x + barWidth / 2,
+                    size.height - 8.dp.toPx(),
+                    android.graphics.Paint().apply {
+                        color = onSurface.copy(alpha = 0.75f).toArgb()
+                        textSize = 11.sp.toPx()
+                        textAlign = android.graphics.Paint.Align.CENTER
+                        isAntiAlias = true
+                    }
+                )
+                restore()
+            }
+        }
+    }
 }
 
 @Composable
@@ -606,135 +758,134 @@ private fun MonthlyTrendLineChartVico(monthlyTrend: List<Int>) {
         return
     }
 
-    // Get theme-aware colors that update with theme changes
-    val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
-    val textColor = onSurfaceColor.toArgb()
-    val axisColor = if (isDarkTheme) AndroidColor.LTGRAY else AndroidColor.DKGRAY
-    val gridColor = if (isDarkTheme) AndroidColor.rgb(80, 80, 80) else AndroidColor.LTGRAY
-    val legendColor = if (isDarkTheme) AndroidColor.LTGRAY else AndroidColor.DKGRAY
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val onSurface = MaterialTheme.colorScheme.onSurface
+    val outline = MaterialTheme.colorScheme.outlineVariant
 
-    // Generate month labels if not provided (fallback)
-    val monthLabels = remember(monthlyTrend.size) {
+    var animationPlayed by remember { mutableStateOf(false) }
+    val progress by animateFloatAsState(
+        targetValue = if (animationPlayed) 1f else 0f,
+        animationSpec = tween(durationMillis = 1100, easing = FastOutSlowInEasing),
+        label = "lineProgress"
+    )
+    LaunchedEffect(Unit) { animationPlayed = true }
+
+    val labels = remember(monthlyTrend.size) {
         List(monthlyTrend.size) { index ->
-            val calendar = java.util.Calendar.getInstance()
-            calendar.add(java.util.Calendar.MONTH, -(monthlyTrend.size - 1 - index))
-            val monthName = java.text.SimpleDateFormat("MMM", java.util.Locale.getDefault())
-                .format(calendar.time)
-            val year = calendar.get(java.util.Calendar.YEAR)
-            "$monthName $year"
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.MONTH, -(monthlyTrend.size - 1 - index))
+            SimpleDateFormat("MMM", Locale.getDefault()).format(calendar.time)
         }
     }
 
-    val entries = remember(monthlyTrend) {
-        monthlyTrend.mapIndexed { index: Int, value: Int ->
-            Entry(index.toFloat(), value.toFloat())
-        }
-    }
+    val maxValue = remember(monthlyTrend) { (monthlyTrend.maxOrNull() ?: 0).coerceAtLeast(1) }
+    val minValue = remember(monthlyTrend) { monthlyTrend.minOrNull() ?: 0 }
 
-    AndroidView(
-        factory = { context ->
-            LineChart(context).apply {
-                val dataSet = LineDataSet(entries, "Monthly Analyses")
-
-                // Styling
-                dataSet.color = AndroidColor.rgb(33, 150, 243)
-                dataSet.valueTextColor = textColor
-                dataSet.setCircleColor(AndroidColor.rgb(33, 150, 243))
-                dataSet.circleRadius = 5f
-                dataSet.lineWidth = 3f
-                dataSet.setDrawFilled(true)
-                dataSet.fillColor = AndroidColor.rgb(33, 150, 243)
-                dataSet.fillAlpha = 50
-                dataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
-                dataSet.cubicIntensity = 0.2f
-                dataSet.setDrawValues(true)
-                dataSet.valueTextSize = 10f
-
-                // Enable highlighting
-                dataSet.setDrawHighlightIndicators(true)
-                dataSet.highlightLineWidth = 2f
-                dataSet.highLightColor = AndroidColor.rgb(255, 152, 0)
-
-                val lineData = LineData(dataSet)
-                this.data = lineData
-
-                // X-Axis configuration with month labels
-                this.xAxis.apply {
-                    position = com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTTOM
-                    valueFormatter = com.github.mikephil.charting.formatter.IndexAxisValueFormatter(monthLabels)
-                    granularity = 1f
-                    setDrawGridLines(false)
-                    labelRotationAngle = -45f
-                    textSize = 10f
-                    setTextColor(axisColor)
-                    setAvoidFirstLastClipping(true)
-                }
-
-                // Y-Axis configuration
-                this.axisLeft.apply {
-                    axisMinimum = 0f
-                    granularity = 1f
-                    textSize = 10f
-                    setTextColor(axisColor)
-                    setDrawGridLines(true)
-                    setGridColor(gridColor)
-                    gridLineWidth = 0.5f
-                }
-
-                this.axisRight.isEnabled = false
-
-                // Description
-                this.description = Description().apply {
-                    text = ""
-                    textSize = 9f
-                    setTextColor(legendColor)
-                }
-
-                // Legend
-                this.legend.apply {
-                    isEnabled = true
-                    textSize = 11f
-                    setTextColor(legendColor)
-                    verticalAlignment = com.github.mikephil.charting.components.Legend.LegendVerticalAlignment.TOP
-                    horizontalAlignment = com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.RIGHT
-                }
-
-                // Set background transparent
-                this.setBackgroundColor(AndroidColor.TRANSPARENT)
-
-                // Enable touch interactions
-                this.setTouchEnabled(true)
-                this.isDragEnabled = true
-                this.setScaleEnabled(false)
-                this.setPinchZoom(false)
-                this.isDoubleTapToZoomEnabled = false
-
-                // Enable value highlighting on touch
-                this.isHighlightPerTapEnabled = true
-                this.isHighlightPerDragEnabled = false
-
-                // Animate the chart
-                this.animateX(1000, com.github.mikephil.charting.animation.Easing.EaseInOutCubic)
-
-                this.invalidate()
-            }
-        },
-        update = { chart ->
-            // Update colors when theme changes
-            val dataSet = chart.data?.getDataSetByIndex(0) as? LineDataSet
-            dataSet?.valueTextColor = textColor
-            chart.xAxis.setTextColor(axisColor)
-            chart.axisLeft.setTextColor(axisColor)
-            chart.axisLeft.setGridColor(gridColor)
-            chart.legend.setTextColor(legendColor)
-            chart.description?.setTextColor(legendColor)
-            chart.invalidate()
-        },
+    Canvas(
         modifier = Modifier
             .fillMaxWidth()
             .height(AppDimensions.detectionImageHeight())
-    )
+            .padding(horizontal = 12.dp, vertical = 16.dp)
+    ) {
+        val width = size.width
+        val height = size.height - 32.dp.toPx()
+        val chartBottom = height
+        val chartTop = 16.dp.toPx()
+        val chartHeight = chartBottom - chartTop
+        val stepX = width / (monthlyTrend.size - 1).coerceAtLeast(1)
+
+        val points = monthlyTrend.mapIndexed { index, value ->
+            val normalized = if (maxValue == minValue) 0.5f else (value - minValue) / (maxValue - minValue).toFloat()
+            val y = chartBottom - (chartHeight * normalized)
+            Offset(index * stepX, y)
+        }
+
+        if (points.isNotEmpty()) {
+            val linePath = Path().apply { moveTo(points.first().x, points.first().y) }
+            val fillPath = Path().apply {
+                moveTo(points.first().x, chartBottom)
+                lineTo(points.first().x, points.first().y)
+            }
+
+            for (i in 0 until points.lastIndex) {
+                val current = points[i]
+                val next = points[i + 1]
+                val controlX = (current.x + next.x) / 2
+
+                linePath.cubicTo(controlX, current.y, controlX, next.y, next.x, next.y)
+                fillPath.cubicTo(controlX, current.y, controlX, next.y, next.x, next.y)
+            }
+
+            fillPath.lineTo(points.last().x, chartBottom)
+            fillPath.close()
+
+            // horizontal grid lines
+            val gridLines = 4
+            repeat(gridLines + 1) { idx ->
+                val y = chartTop + (chartHeight / gridLines) * idx
+                drawLine(
+                    color = outline.copy(alpha = 0.25f),
+                    start = Offset(0f, y),
+                    end = Offset(width * progress, y),
+                    strokeWidth = 1.dp.toPx()
+                )
+            }
+
+            // Fill under curve
+            drawPath(
+                path = fillPath,
+                brush = Brush.verticalGradient(
+                    colors = listOf(primaryColor.copy(alpha = 0.35f), Color.Transparent),
+                    startY = chartTop,
+                    endY = chartBottom
+                ),
+                alpha = progress
+            )
+
+            // Curve
+            drawPath(
+                path = linePath,
+                color = primaryColor,
+                style = Stroke(width = 3.dp.toPx()),
+                alpha = progress
+            )
+
+            points.forEachIndexed { index, point ->
+                if (index <= (points.lastIndex * progress).toInt()) {
+                    drawCircle(color = primaryColor.copy(alpha = 0.2f), radius = 8.dp.toPx(), center = point)
+                    drawCircle(color = primaryColor, radius = 5.dp.toPx(), center = point)
+                    drawCircle(color = Color.White, radius = 2.dp.toPx(), center = point)
+
+                    drawContext.canvas.nativeCanvas.apply {
+                        drawText(
+                            monthlyTrend[index].toString(),
+                            point.x,
+                            point.y - 10.dp.toPx(),
+                            android.graphics.Paint().apply {
+                                color = onSurface.toArgb()
+                                textSize = 11.sp.toPx()
+                                textAlign = android.graphics.Paint.Align.CENTER
+                                isFakeBoldText = true
+                                isAntiAlias = true
+                            }
+                        )
+
+                        drawText(
+                            labels[index],
+                            point.x,
+                            size.height,
+                            android.graphics.Paint().apply {
+                                color = onSurface.copy(alpha = 0.75f).toArgb()
+                                textSize = 11.sp.toPx()
+                                textAlign = android.graphics.Paint.Align.CENTER
+                                isAntiAlias = true
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable

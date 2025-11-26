@@ -8,6 +8,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,9 +18,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -56,6 +56,20 @@ fun CameraScreen(
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
     var camera: Camera? by remember { mutableStateOf(null) }
     var previewView: PreviewView? by remember { mutableStateOf(null) }
+
+    // Theme colors
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
+
+    // Dimensions
+    val paddingMedium = AppDimensions.paddingMedium()
+    val paddingLarge = AppDimensions.paddingLarge()
+    val cornerRadiusMedium = AppDimensions.cornerRadiusMedium()
+    val paddingExtraSmall = AppDimensions.paddingExtraSmall()
+    val iconSizeSmall = AppDimensions.iconSizeSmall()
+    val paddingSmall = AppDimensions.paddingSmall()
+    val buttonHeight = AppDimensions.buttonHeight()
+    val iconSizeMedium = AppDimensions.iconSizeMedium()
 
     Box(
         modifier = Modifier
@@ -110,7 +124,6 @@ fun CameraScreen(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(AppDimensions.paddingExtraLarge())
         ) {
             val squareSize = size.minDimension * 0.8f
             val left = (size.width - squareSize) / 2f
@@ -132,7 +145,7 @@ fun CameraScreen(
             
             // Draw guide square border
             drawRect(
-                color = Color(0xFF4CAF50),
+                color = primaryColor,
                 topLeft = androidx.compose.ui.geometry.Offset(left, top),
                 size = androidx.compose.ui.geometry.Size(squareSize, squareSize),
                 style = Stroke(width = 3f)
@@ -144,13 +157,13 @@ fun CameraScreen(
             
             // Top-left bracket
             drawLine(
-                color = Color(0xFF4CAF50),
+                color = primaryColor,
                 start = androidx.compose.ui.geometry.Offset(left, top),
                 end = androidx.compose.ui.geometry.Offset(left + bracketLength, top),
                 strokeWidth = bracketWidth
             )
             drawLine(
-                color = Color(0xFF4CAF50),
+                color = primaryColor,
                 start = androidx.compose.ui.geometry.Offset(left, top),
                 end = androidx.compose.ui.geometry.Offset(left, top + bracketLength),
                 strokeWidth = bracketWidth
@@ -158,13 +171,13 @@ fun CameraScreen(
             
             // Top-right bracket
             drawLine(
-                color = Color(0xFF4CAF50),
+                color = primaryColor,
                 start = androidx.compose.ui.geometry.Offset(left + squareSize, top),
                 end = androidx.compose.ui.geometry.Offset(left + squareSize - bracketLength, top),
                 strokeWidth = bracketWidth
             )
             drawLine(
-                color = Color(0xFF4CAF50),
+                color = primaryColor,
                 start = androidx.compose.ui.geometry.Offset(left + squareSize, top),
                 end = androidx.compose.ui.geometry.Offset(left + squareSize, top + bracketLength),
                 strokeWidth = bracketWidth
@@ -172,13 +185,13 @@ fun CameraScreen(
             
             // Bottom-left bracket
             drawLine(
-                color = Color(0xFF4CAF50),
+                color = primaryColor,
                 start = androidx.compose.ui.geometry.Offset(left, top + squareSize),
                 end = androidx.compose.ui.geometry.Offset(left + bracketLength, top + squareSize),
                 strokeWidth = bracketWidth
             )
             drawLine(
-                color = Color(0xFF4CAF50),
+                color = primaryColor,
                 start = androidx.compose.ui.geometry.Offset(left, top + squareSize),
                 end = androidx.compose.ui.geometry.Offset(left, top + squareSize - bracketLength),
                 strokeWidth = bracketWidth
@@ -186,13 +199,13 @@ fun CameraScreen(
             
             // Bottom-right bracket
             drawLine(
-                color = Color(0xFF4CAF50),
+                color = primaryColor,
                 start = androidx.compose.ui.geometry.Offset(left + squareSize, top + squareSize),
                 end = androidx.compose.ui.geometry.Offset(left + squareSize - bracketLength, top + squareSize),
                 strokeWidth = bracketWidth
             )
             drawLine(
-                color = Color(0xFF4CAF50),
+                color = primaryColor,
                 start = androidx.compose.ui.geometry.Offset(left + squareSize, top + squareSize),
                 end = androidx.compose.ui.geometry.Offset(left + squareSize, top + squareSize - bracketLength),
                 strokeWidth = bracketWidth
@@ -227,158 +240,166 @@ fun CameraScreen(
             }
         }
         
-        // Top Bar
-        Column(
+        // Top Bar with Gradient
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
                 .background(
-                    Color.Black.copy(alpha = 0.5f)
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.7f),
+                            Color.Transparent
+                        )
+                    )
                 )
-                .padding(AppDimensions.paddingMedium())
+                .padding(paddingMedium)
+                .padding(bottom = paddingLarge)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = onBack,
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color.White.copy(alpha = 0.2f)
-                    )
-                ) {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = "Close",
-                        tint = Color.White
-                    )
-                }
-                
-                Text(
-                    text = "Position leaf in frame",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                
-                IconButton(
-                    onClick = { 
-                        flashMode = when(flashMode) {
-                            ImageCapture.FLASH_MODE_OFF -> ImageCapture.FLASH_MODE_ON
-                            ImageCapture.FLASH_MODE_ON -> ImageCapture.FLASH_MODE_AUTO
-                            else -> ImageCapture.FLASH_MODE_OFF
-                        }
-                        imageCapture?.flashMode = flashMode
-                    },
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color.White.copy(alpha = 0.2f)
-                    )
-                ) {
-                    Icon(
-                        when(flashMode) {
-                            ImageCapture.FLASH_MODE_ON -> Icons.Default.FlashOn
-                            ImageCapture.FLASH_MODE_AUTO -> Icons.Default.FlashAuto
-                            else -> Icons.Default.FlashOff
-                        },
-                        contentDescription = "Flash",
-                        tint = Color.White
-                    )
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
-            
-            // Instructions
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF4CAF50).copy(alpha = 0.95f)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingExtraSmall())
-            ) {
+            Column {
                 Row(
-                    modifier = Modifier.padding(AppDimensions.paddingMedium()),
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        Icons.Default.Info,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(AppDimensions.iconSizeSmall())
-                    )
-                    Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
+                    IconButton(
+                        onClick = onBack,
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.2f)
+                        )
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color.White
+                        )
+                    }
+                    
                     Text(
-                        text = "Position the rice leaf inside the frame for best results",
+                        text = "Position leaf in frame",
                         color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        lineHeight = 16.sp
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
                     )
+                    
+                    IconButton(
+                        onClick = { 
+                            flashMode = when(flashMode) {
+                                ImageCapture.FLASH_MODE_OFF -> ImageCapture.FLASH_MODE_ON
+                                ImageCapture.FLASH_MODE_ON -> ImageCapture.FLASH_MODE_AUTO
+                                else -> ImageCapture.FLASH_MODE_OFF
+                            }
+                            imageCapture?.flashMode = flashMode
+                        },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.2f)
+                        )
+                    ) {
+                        Icon(
+                            when(flashMode) {
+                                ImageCapture.FLASH_MODE_ON -> Icons.Default.FlashOn
+                                ImageCapture.FLASH_MODE_AUTO -> Icons.Default.FlashAuto
+                                else -> Icons.Default.FlashOff
+                            },
+                            contentDescription = "Flash",
+                            tint = Color.White
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(paddingMedium))
+                
+                // Instructions
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(cornerRadiusMedium),
+                    colors = CardDefaults.cardColors(
+                        containerColor = primaryColor.copy(alpha = 0.9f)
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = paddingExtraSmall)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(paddingMedium),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = null,
+                            tint = onPrimaryColor,
+                            modifier = Modifier.size(iconSizeSmall)
+                        )
+                        Spacer(modifier = Modifier.width(paddingSmall))
+                        Text(
+                            text = "Position the rice leaf inside the frame for best results",
+                            color = onPrimaryColor,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }
         
-        // Bottom Controls
-        Row(
+        // Bottom Controls with Gradient
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .background(Color.Black.copy(alpha = 0.5f))
-                .padding(AppDimensions.paddingLarge()),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Flip Camera Button - Now functional
-            IconButton(
-                onClick = {
-                    lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
-                        CameraSelector.LENS_FACING_FRONT
-                    } else {
-                        CameraSelector.LENS_FACING_BACK
-                    }
-                },
-                modifier = Modifier.size(AppDimensions.buttonHeight()),
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = Color.White.copy(alpha = 0.2f)
-                ),
-                enabled = !isCapturing
-            ) {
-                Icon(
-                    Icons.Default.FlipCameraAndroid,
-                    contentDescription = "Flip Camera",
-                    tint = Color.White,
-                    modifier = Modifier.size(AppDimensions.iconSizeMedium())
-                )
-            }
-            
-            // Capture Button
-            Box(
-                modifier = Modifier.size(AppDimensions.fabSize()),
-                contentAlignment = Alignment.Center
-            ) {
-                if (isCapturing) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(AppDimensions.paddingSmall()),
-                        color = Color.White,
-                        strokeWidth = AppDimensions.paddingExtraSmall()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.8f)
+                        )
                     )
-                } else {
-                    // Outer ring
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Color.White.copy(alpha = 0.3f),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        // Inner button
-                        IconButton(
+                )
+                .padding(paddingLarge)
+                .padding(top = paddingMedium)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Flip Camera Button
+                IconButton(
+                    onClick = {
+                        lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
+                            CameraSelector.LENS_FACING_FRONT
+                        } else {
+                            CameraSelector.LENS_FACING_BACK
+                        }
+                    },
+                    modifier = Modifier.size(buttonHeight),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.White.copy(alpha = 0.2f)
+                    ),
+                    enabled = !isCapturing
+                ) {
+                    Icon(
+                        Icons.Default.FlipCameraAndroid,
+                        contentDescription = "Flip Camera",
+                        tint = Color.White,
+                        modifier = Modifier.size(iconSizeMedium)
+                    )
+                }
+                
+                // Capture Button - Enhanced Design
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .border(4.dp, Color.White, CircleShape)
+                        .padding(6.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isCapturing) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.fillMaxSize(),
+                            color = Color.White,
+                            strokeWidth = 3.dp
+                        )
+                    } else {
+                        Button(
                             onClick = {
                                 imageCapture?.let { capture ->
                                     isCapturing = true
@@ -390,42 +411,39 @@ fun CameraScreen(
                                     }
                                 }
                             },
-                            modifier = Modifier.size(AppDimensions.fabSize()),
-                            colors = IconButtonDefaults.iconButtonColors(
+                            modifier = Modifier.fillMaxSize(),
+                            shape = CircleShape,
+                            colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.White
                             ),
-                            enabled = cameraReady
+                            enabled = cameraReady,
+                            contentPadding = PaddingValues(0.dp)
                         ) {
-                            Icon(
-                                Icons.Default.CameraAlt,
-                                contentDescription = "Capture",
-                                tint = Color(0xFF4CAF50),
-                                modifier = Modifier.size(AppDimensions.iconSizeLarge())
-                            )
+                            // Inner circle is the button itself
                         }
                     }
                 }
-            }
-            
-            // Grid Toggle - Now functional
-            IconButton(
-                onClick = { showGrid = !showGrid },
-                modifier = Modifier.size(AppDimensions.buttonHeight()),
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = if (showGrid) {
-                        Color(0xFF4CAF50).copy(alpha = 0.5f)
-                    } else {
-                        Color.White.copy(alpha = 0.2f)
-                    }
-                ),
-                enabled = !isCapturing
-            ) {
-                Icon(
-                    if (showGrid) Icons.Default.GridOn else Icons.Default.GridOff,
-                    contentDescription = "Toggle Grid",
-                    tint = Color.White,
-                    modifier = Modifier.size(AppDimensions.iconSizeMedium())
-                )
+                
+                // Grid Toggle
+                IconButton(
+                    onClick = { showGrid = !showGrid },
+                    modifier = Modifier.size(buttonHeight),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = if (showGrid) {
+                            primaryColor.copy(alpha = 0.8f)
+                        } else {
+                            Color.White.copy(alpha = 0.2f)
+                        }
+                    ),
+                    enabled = !isCapturing
+                ) {
+                    Icon(
+                        if (showGrid) Icons.Default.GridOn else Icons.Default.GridOff,
+                        contentDescription = "Toggle Grid",
+                        tint = Color.White,
+                        modifier = Modifier.size(iconSizeMedium)
+                    )
+                }
             }
         }
     }

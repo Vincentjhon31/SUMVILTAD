@@ -1,6 +1,7 @@
 package com.zynt.sumviltadconnect.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,6 +14,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -44,124 +47,205 @@ fun HistoryScreen(
         viewModel.loadHistory()
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
+    val paddingMedium = AppDimensions.paddingMedium()
+    val paddingSmall = AppDimensions.paddingSmall()
+    val paddingLarge = AppDimensions.paddingLarge()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        // Top App Bar
-        TopAppBar(
-            title = { Text("Detection History") },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+        // Gradient Header Background
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(280.dp)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.primaryContainer
+                        )
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Custom Top Bar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(horizontal = paddingMedium, vertical = paddingSmall),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = Color.White,
+                            containerColor = Color.White.copy(alpha = 0.2f)
+                        )
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                    
+                    Spacer(modifier = Modifier.width(paddingMedium))
+                    
+                    Text(
+                        text = "Detection History",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
-            },
-            actions = {
-                IconButton(onClick = { viewModel.loadHistory() }) {
+
+                IconButton(
+                    onClick = { viewModel.loadHistory() },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = Color.White,
+                        containerColor = Color.White.copy(alpha = 0.2f)
+                    )
+                ) {
                     Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                 }
             }
-        )
 
-        // Content
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(AppDimensions.paddingMedium())
-        ) {
-            when {
-                isLoading -> {
-                    // Brand skeleton loading state
-                    FullScreenSkeleton(listItems = 6)
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            BrandProgressIndicator(size = 56.dp)
-                            Spacer(Modifier.height(16.dp))
-                            Text("Preparing your history...", style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(paddingSmall))
+
+            // Content Container
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = paddingMedium)
+            ) {
+                when {
+                    isLoading -> {
+                        // Brand skeleton loading state
+                        FullScreenSkeleton(listItems = 6)
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                BrandProgressIndicator(size = 56.dp)
+                                Spacer(Modifier.height(16.dp))
+                                Text("Preparing your history...", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                            }
                         }
                     }
-                }
 
-                errorMessage != null -> {
-                    // Error state
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            Icons.Default.Error,
-                            contentDescription = "Error",
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = errorMessage!!,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = { viewModel.loadHistory() }) {
-                            Text("Retry")
-                        }
-                    }
-                }
-
-                historyRecords.isEmpty() -> {
-                    // Empty state
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            Icons.Default.History,
-                            contentDescription = "No history",
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "No detection history",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Start detecting rice diseases to see your history here",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Button(
-                            onClick = { navController.navigate("detection") }
+                    errorMessage != null -> {
+                        // Error state
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(top = paddingLarge),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                         ) {
-                            Icon(Icons.Default.CameraAlt, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Start Detection")
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.Error,
+                                    contentDescription = "Error",
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = errorMessage!!,
+                                    color = MaterialTheme.colorScheme.error,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Button(onClick = { viewModel.loadHistory() }) {
+                                    Text("Retry")
+                                }
+                            }
                         }
                     }
-                }
 
-                else -> {
-                    // History list
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        item {
-                            Text(
-                                text = "${historyRecords.size} Detection${if (historyRecords.size != 1) "s" else ""}",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+                    historyRecords.isEmpty() -> {
+                        // Empty state
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(top = paddingLarge),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.History,
+                                    contentDescription = "No history",
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "No detection history",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Start detecting rice diseases to see your history here",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                                Button(
+                                    onClick = { navController.navigate("detection") }
+                                ) {
+                                    Icon(Icons.Default.CameraAlt, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Start Detection")
+                                }
+                            }
                         }
+                    }
 
-                        items(historyRecords) { record ->
-                            HistoryRecordCard(record = record)
-                        }
+                    else -> {
+                        // History list
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            contentPadding = PaddingValues(bottom = 16.dp)
+                        ) {
+                            item {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+                                    )
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Info, 
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "${historyRecords.size} Detection${if (historyRecords.size != 1) "s" else ""} Recorded",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
+                            }
 
-                        item {
-                            Spacer(modifier = Modifier.height(16.dp))
+                            items(historyRecords) { record ->
+                                HistoryRecordCard(record = record)
+                            }
                         }
                     }
                 }
@@ -172,12 +256,15 @@ fun HistoryScreen(
 
 @Composable
 fun HistoryRecordCard(record: CropHealthRecord) {
+    val cardElevation = AppDimensions.cardElevation()
+    val paddingMedium = AppDimensions.paddingMedium()
+
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation())
+        elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
     ) {
         Column(
-            modifier = Modifier.padding(AppDimensions.paddingMedium())
+            modifier = Modifier.padding(paddingMedium)
         ) {
             // Header with date
             Row(

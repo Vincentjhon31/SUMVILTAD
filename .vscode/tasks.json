@@ -1,0 +1,74 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Debug APK",
+      "type": "shell",
+      "command": "./gradlew assembleDebug",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": "$gradle"
+    },
+    {
+      "label": "Install Debug APK",
+      "type": "shell",
+      "command": "./gradlew installDebug",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "dependsOn": "Build Debug APK"
+    },
+    {
+      "label": "Run App",
+      "type": "shell",
+      "command": "& '${env:LOCALAPPDATA}/Android/Sdk/platform-tools/adb' shell am start -n com.zynt.sumviltadconnect/.ui.screens.SplashActivity",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "dependsOn": "Install Debug APK"
+    },
+    {
+      "label": "Clean Project",
+      "type": "shell",
+      "command": "./gradlew clean",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "ADB Logcat",
+      "type": "shell",
+      "command": "& '${env:LOCALAPPDATA}/Android/Sdk/platform-tools/adb' logcat -v color",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "ADB Devices",
+      "type": "shell",
+      "command": "& '${env:LOCALAPPDATA}/Android/Sdk/platform-tools/adb' devices",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

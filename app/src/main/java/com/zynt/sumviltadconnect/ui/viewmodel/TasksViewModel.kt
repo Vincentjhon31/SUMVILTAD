@@ -87,7 +87,10 @@ class TasksViewModel(app: Application): AndroidViewModel(app) {
 
     fun refresh() {
         _isRefreshing.value = true
-        if (_state.value !is TasksUiState.Loading) _state.value = TasksUiState.Loading
+        // Only show skeleton loading if we have no data
+        if (_allTasks.value.isEmpty()) {
+            _state.value = TasksUiState.Loading
+        }
         viewModelScope.launch {
             try {
                 // Get tasks from repository

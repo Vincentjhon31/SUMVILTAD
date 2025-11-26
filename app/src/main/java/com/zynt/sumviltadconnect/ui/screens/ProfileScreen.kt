@@ -1,31 +1,43 @@
 package com.zynt.sumviltadconnect.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.zynt.sumviltadconnect.BuildConfig
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
 import com.zynt.sumviltadconnect.ui.viewmodel.AuthViewModel
 import com.zynt.sumviltadconnect.ui.viewmodel.SettingsViewModel
-import com.zynt.sumviltadconnect.ui.viewmodel.UpdateViewModel
 import com.zynt.sumviltadconnect.ui.viewmodel.UpdateState
-import com.zynt.sumviltadconnect.ui.theme.AppDimensions
+import com.zynt.sumviltadconnect.ui.viewmodel.UpdateViewModel
 import com.zynt.sumviltadconnect.utils.TokenManager
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,200 +78,150 @@ fun ProfileScreen(
     val userName = TokenManager.getUserName(context) ?: "User"
     val userEmail = TokenManager.getUserEmail(context) ?: "user@example.com"
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // Top App Bar
-        TopAppBar(
-            title = { Text("Profile") },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                }
-            }
-        )
-
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(padding)
                 .verticalScroll(scrollState)
-                .padding(AppDimensions.paddingMedium())
         ) {
-            // Update Available Banner
-            if (updateState is UpdateState.UpdateAvailable) {
-                val release = (updateState as UpdateState.UpdateAvailable).release
-                val latestVersion = release.tagName.removePrefix("v")
-                
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { /* Dialog will show automatically */ },
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(AppDimensions.paddingMedium()),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.NewReleases,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(AppDimensions.iconSizeMedium())
-                        )
-                        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "Update Available!",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                            Text(
-                                "Version $latestVersion is ready to download",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                        Icon(
-                            Icons.Default.ChevronRight,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                }
-                
-                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
-            }
-
-            // Profile Header
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(AppDimensions.paddingLarge()),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Profile Avatar
-                    Surface(
-                        modifier = Modifier.size(AppDimensions.fabSize()),
-                        shape = MaterialTheme.shapes.large,
-                        color = MaterialTheme.colorScheme.primary
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = "Profile",
-                                modifier = Modifier.size(40.dp),
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = userName,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-
-                    Text(
-                        text = userEmail,
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Profile Options
-            Text(
-                text = "Account",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+            // Enhanced Header
+            EnhancedProfileHeader(
+                userName = userName,
+                userEmail = userEmail,
+                onBackClick = { navController.popBackStack() }
             )
 
-            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
-
-            // Account Information Card
-            Card(
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset(y = (-24).dp) // Overlap with header
+                    .padding(horizontal = AppDimensions.paddingMedium())
             ) {
-                Column {
-                    ProfileMenuItem(
+                // Update Available Banner
+                if (updateState is UpdateState.UpdateAvailable) {
+                    val release = (updateState as UpdateState.UpdateAvailable).release
+                    val latestVersion = release.tagName.removePrefix("v")
+                    
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = AppDimensions.paddingMedium())
+                            .clickable { /* Dialog will show automatically */ },
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        ),
+                        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(AppDimensions.paddingMedium()),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = CircleShape,
+                                modifier = Modifier.size(40.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        Icons.Default.NewReleases,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    "Update Available!",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                                Text(
+                                    "Version $latestVersion is ready",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                            Icon(
+                                Icons.Default.ChevronRight,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+                }
+
+                // Account Section
+                ProfileSectionTitle("Account")
+                EnhancedProfileSection {
+                    EnhancedProfileMenuItem(
                         icon = Icons.Default.Person,
                         title = "Personal Information",
                         subtitle = "Name, email, and other details",
                         onClick = { navController.navigate("personal_information") }
                     )
 
-                    Divider()
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium()),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
 
-                    ProfileMenuItem(
+                    EnhancedProfileMenuItem(
                         icon = Icons.Default.History,
                         title = "Detection History",
                         subtitle = "View your previous detections",
                         onClick = { navController.navigate("history") }
                     )
 
-                    Divider()
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium()),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
 
-                    ProfileMenuItem(
+                    EnhancedProfileMenuItem(
                         icon = Icons.Default.CameraAlt,
                         title = "New Detection",
                         subtitle = "Scan rice leaves for diseases",
                         onClick = { navController.navigate("detection") }
                     )
                 }
-            }
 
-            Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
-
-            // App Information
-            Text(
-                text = "App",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
-
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column {
-                    ProfileMenuItem(
+                // App Section
+                ProfileSectionTitle("App")
+                EnhancedProfileSection {
+                    EnhancedProfileMenuItem(
                         icon = Icons.Default.Info,
                         title = "About",
                         subtitle = "Learn about SumviltadConnect",
                         onClick = { showAboutDialog = true }
                     )
 
-                    Divider()
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium()),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
 
-                    ProfileMenuItem(
+                    EnhancedProfileMenuItem(
                         icon = Icons.Default.Help,
                         title = "Help & Support",
                         subtitle = "Get help with the app",
                         onClick = { showHelpDialog = true }
                     )
 
-                    Divider()
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium()),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
 
-                    ProfileMenuItem(
+                    EnhancedProfileMenuItem(
                         icon = Icons.Default.SystemUpdate,
                         title = "Check for Updates",
                         subtitle = if (updateState is UpdateState.Checking) 
@@ -271,8 +233,9 @@ fun ProfileScreen(
                             when (updateState) {
                                 is UpdateState.Checking -> {
                                     CircularProgressIndicator(
-                                        modifier = Modifier.size(AppDimensions.iconSizeSmall()),
-                                        strokeWidth = 2.dp
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp,
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                 }
                                 is UpdateState.UpdateAvailable -> {
@@ -280,7 +243,7 @@ fun ProfileScreen(
                                         Icons.Default.NewReleases,
                                         contentDescription = "Update available",
                                         tint = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
+                                        modifier = Modifier.size(20.dp)
                                     )
                                 }
                                 is UpdateState.UpToDate -> {
@@ -288,7 +251,7 @@ fun ProfileScreen(
                                         Icons.Default.CheckCircle,
                                         contentDescription = "Up to date",
                                         tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(AppDimensions.iconSizeMedium())
+                                        modifier = Modifier.size(20.dp)
                                     )
                                 }
                                 else -> null
@@ -296,9 +259,12 @@ fun ProfileScreen(
                         }
                     )
 
-                    Divider()
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium()),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
 
-                    ProfileMenuItem(
+                    EnhancedProfileMenuItem(
                         icon = Icons.Default.Settings,
                         title = "Settings",
                         subtitle = "App preferences and settings",
@@ -313,21 +279,20 @@ fun ProfileScreen(
                     )
 
                     // Settings Section - Expandable
-                    androidx.compose.animation.AnimatedVisibility(
+                    AnimatedVisibility(
                         visible = showSettingsSection
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f))
                                 .padding(AppDimensions.paddingMedium())
                         ) {
                             // Theme Settings
                             Text(
                                 text = "Theme",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(bottom = AppDimensions.paddingSmall())
                             )
 
@@ -368,21 +333,26 @@ fun ProfileScreen(
                                     .padding(AppDimensions.paddingMedium()),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
-                                    Icons.Default.Notifications,
-                                    contentDescription = null,
-                                    tint = if (notificationsEnabled)
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(AppDimensions.iconSizeMedium())
-                                )
-                                Spacer(Modifier.width(AppDimensions.paddingSmall()))
+                                Surface(
+                                    color = if (notificationsEnabled) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                                    shape = CircleShape,
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            Icons.Default.Notifications,
+                                            contentDescription = null,
+                                            tint = if (notificationsEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                }
+                                Spacer(Modifier.width(AppDimensions.paddingMedium()))
                                 Column(Modifier.weight(1f)) {
                                     Text(
                                         "Notifications",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
@@ -403,42 +373,47 @@ fun ProfileScreen(
                         }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(AppDimensions.paddingExtraLarge()))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
-            // Logout Button
-            Button(
-                onClick = { showLogoutDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(AppDimensions.buttonHeight()),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                ),
-                enabled = !isLoading
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(AppDimensions.iconSizeSmall()),
-                        color = MaterialTheme.colorScheme.onError
-                    )
-                } else {
-                    Icon(Icons.Default.Logout, contentDescription = null)
-                    Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
-                    Text("Logout")
+                // Logout Button
+                Button(
+                    onClick = { showLogoutDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    ),
+                    shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
+                    enabled = !isLoading
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = MaterialTheme.colorScheme.onError,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
+                        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
+                        Text("Logout", style = MaterialTheme.typography.titleMedium)
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
+
+                // App Version
+                Text(
+                    text = "SumviltadConnect v${BuildConfig.VERSION_NAME}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+                
+                Spacer(modifier = Modifier.height(AppDimensions.paddingExtraLarge()))
             }
-
-            Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
-
-            // App Version
-            Text(
-                text = "SumviltadConnect v${BuildConfig.VERSION_NAME}",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth()
-            )
         }
     }
 
@@ -446,8 +421,9 @@ fun ProfileScreen(
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
+            icon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null) },
             title = { Text("Logout") },
-            text = { Text("Are you sure you want to logout?") },
+            text = { Text("Are you sure you want to logout from your account?") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -455,7 +431,8 @@ fun ProfileScreen(
                         authViewModel.logout(context) {
                             // Navigation handled by LaunchedEffect
                         }
-                    }
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
                     Text("Logout")
                 }
@@ -481,12 +458,12 @@ fun ProfileScreen(
                         Icons.Default.Info,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         "About SumviltadConnect",
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -502,18 +479,19 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                        )
+                        ),
+                        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
                                 "About Us",
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                "SumviltadConnect is an innovative agricultural technology platform designed to empower Filipino rice farmers. We combine artificial intelligence with traditional farming wisdom to provide instant, accurate disease detection and management solutions directly from your mobile device.",
+                                "SumviltadConnect is an innovative agricultural technology platform designed to empower Filipino rice farmers. We combine artificial intelligence with traditional farming wisdom.",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -527,18 +505,19 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
-                        )
+                        ),
+                        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
                                 "Our Mission",
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.secondary
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                "To revolutionize rice farming in the Philippines by making advanced disease detection technology accessible to every farmer. We aim to reduce crop losses, increase yields, and support sustainable farming practices through cutting-edge AI technology and community collaboration.",
+                                "To revolutionize rice farming in the Philippines by making advanced disease detection technology accessible to every farmer.",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -552,12 +531,13 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f)
-                        )
+                        ),
+                        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
                                 "Our Goals",
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.tertiary
                             )
@@ -569,23 +549,10 @@ fun ProfileScreen(
                             GoalItem("Build a thriving farming community")
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Version Info
-                    Text(
-                        "Version ${BuildConfig.VERSION_NAME}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                    )
                 }
             },
             confirmButton = {
-                Button(
-                    onClick = { showAboutDialog = false }
-                ) {
+                TextButton(onClick = { showAboutDialog = false }) {
                     Text("Close")
                 }
             }
@@ -605,12 +572,12 @@ fun ProfileScreen(
                         Icons.Default.Help,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         "Help & Support",
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -626,7 +593,8 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                        )
+                        ),
+                        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -634,13 +602,13 @@ fun ProfileScreen(
                                     Icons.Default.Email,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(AppDimensions.iconSizeMedium())
+                                    modifier = Modifier.size(20.dp)
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
                                         "Email Support",
-                                        style = MaterialTheme.typography.titleMedium,
+                                        style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
@@ -661,12 +629,13 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
-                        )
+                        ),
+                        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
                                 "Quick Help",
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.secondary
                             )
@@ -681,14 +650,7 @@ fun ProfileScreen(
                             
                             HelpItem(
                                 title = "Understanding results",
-                                description = "The app shows disease name, confidence level, and management recommendations in English and Tagalog."
-                            )
-                            
-                            Spacer(modifier = Modifier.height(8.dp))
-                            
-                            HelpItem(
-                                title = "View detection history",
-                                description = "Access your past detections from Profile > Detection History."
+                                description = "The app shows disease name, confidence level, and management recommendations."
                             )
                             
                             Spacer(modifier = Modifier.height(8.dp))
@@ -699,47 +661,10 @@ fun ProfileScreen(
                             )
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // GitHub Repository
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f)
-                        )
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    Icons.Default.Code,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.tertiary,
-                                    modifier = Modifier.size(AppDimensions.iconSizeMedium())
-                                )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column {
-                                    Text(
-                                        "Open Source",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                    Text(
-                                        "github.com/Vincentjhon31/SUMVILTAD",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                        }
-                    }
                 }
             },
             confirmButton = {
-                Button(
-                    onClick = { showHelpDialog = false }
-                ) {
+                TextButton(onClick = { showHelpDialog = false }) {
                     Text("Close")
                 }
             }
@@ -753,125 +678,50 @@ fun ProfileScreen(
         
         AlertDialog(
             onDismissRequest = { updateViewModel.dismissUpdate() },
-            title = { 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        Icons.Default.NewReleases,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            "Update Available",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            "Version $latestVersion",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            },
+            icon = { Icon(Icons.Default.SystemUpdate, contentDescription = null) },
+            title = { Text("Update Available") },
             text = {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                        )
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                "Current Version: ${BuildConfig.VERSION_NAME}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                "Latest Version: $latestVersion",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-
+                    Text(
+                        "A new version of SumviltadConnect is available!",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        "Version: $latestVersion",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
                     if (!release.body.isNullOrBlank()) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
-                            )
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(
-                                    "What's New",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    release.body,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Show download size if available
-                    val apkAsset = release.assets.firstOrNull { 
-                        it.name.endsWith(".apk", ignoreCase = true) 
-                    }
-                    
-                    if (apkAsset != null) {
-                        val sizeMB = apkAsset.size / (1024.0 * 1024.0)
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Download Size: %.2f MB".format(sizeMB),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.fillMaxWidth()
+                            "What's New:",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            release.body,
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
             },
             confirmButton = {
-                Button(
+                TextButton(
                     onClick = { 
                         updateViewModel.downloadApk(context, release)
                         updateViewModel.dismissUpdate()
                     }
                 ) {
-                    Icon(
-                        Icons.Default.Download,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
                     Text("Download")
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { updateViewModel.dismissUpdate() }
-                ) {
+                TextButton(onClick = { updateViewModel.dismissUpdate() }) {
                     Text("Later")
                 }
             }
@@ -881,8 +731,7 @@ fun ProfileScreen(
     // Update Check Error Snackbar
     if (updateState is UpdateState.Error) {
         LaunchedEffect(updateState) {
-            // Auto-dismiss error after 3 seconds
-            kotlinx.coroutines.delay(3000)
+            delay(3000)
             updateViewModel.resetState()
         }
     }
@@ -890,16 +739,135 @@ fun ProfileScreen(
     // Up to Date Snackbar
     if (updateState is UpdateState.UpToDate) {
         LaunchedEffect(updateState) {
-            // Auto-dismiss after 2 seconds
-            kotlinx.coroutines.delay(2000)
+            delay(2000)
             updateViewModel.resetState()
         }
     }
 }
 
 @Composable
-private fun ProfileMenuItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+private fun EnhancedProfileHeader(
+    userName: String,
+    userEmail: String,
+    onBackClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.primaryContainer
+                    )
+                )
+            )
+            .padding(bottom = 40.dp) // Extra padding for overlap
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(AppDimensions.paddingLarge())
+        ) {
+            // Back Button
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier
+                    .background(Color.Black.copy(alpha = 0.1f), CircleShape)
+                    .size(40.dp)
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+
+            // Profile Info
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Avatar
+                Surface(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .border(
+                            width = 4.dp,
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
+                            shape = CircleShape
+                        ),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            text = userName.take(1).uppercase(),
+                            style = MaterialTheme.typography.displayMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+                
+                Text(
+                    text = userName,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                Text(
+                    text = userEmail,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun EnhancedProfileSection(
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = AppDimensions.paddingSmall()),
+            content = content
+        )
+    }
+}
+
+@Composable
+private fun ProfileSectionTitle(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(
+            start = AppDimensions.paddingSmall(),
+            top = AppDimensions.paddingLarge(),
+            bottom = AppDimensions.paddingSmall()
+        )
+    )
+}
+
+@Composable
+private fun EnhancedProfileMenuItem(
+    icon: ImageVector,
     title: String,
     subtitle: String,
     onClick: () -> Unit,
@@ -909,28 +877,39 @@ private fun ProfileMenuItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(AppDimensions.paddingMedium()),
+            .padding(
+                horizontal = AppDimensions.paddingMedium(),
+                vertical = AppDimensions.paddingMedium()
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(AppDimensions.iconSizeMedium())
-        )
+        Surface(
+            color = MaterialTheme.colorScheme.primaryContainer,
+            shape = CircleShape,
+            modifier = Modifier.size(40.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = subtitle,
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -941,7 +920,7 @@ private fun ProfileMenuItem(
             Icon(
                 Icons.Default.ChevronRight,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
             )
         }
     }
@@ -950,20 +929,20 @@ private fun ProfileMenuItem(
 @Composable
 private fun SettingsThemeOption(
     title: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.cornerRadiusSmall()))
             .clickable(onClick = onClick)
             .background(
                 if (isSelected)
                     MaterialTheme.colorScheme.primaryContainer
                 else
-                    MaterialTheme.colorScheme.surface
+                    Color.Transparent
             )
             .padding(AppDimensions.paddingMedium()),
         verticalAlignment = Alignment.CenterVertically
@@ -975,9 +954,9 @@ private fun SettingsThemeOption(
                 MaterialTheme.colorScheme.primary
             else
                 MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(AppDimensions.iconSizeMedium())
+            modifier = Modifier.size(24.dp)
         )
-        Spacer(Modifier.width(AppDimensions.paddingSmall()))
+        Spacer(Modifier.width(AppDimensions.paddingMedium()))
         Text(
             title,
             style = MaterialTheme.typography.bodyMedium,
@@ -993,7 +972,7 @@ private fun SettingsThemeOption(
                 Icons.Default.Check,
                 contentDescription = "Selected",
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(AppDimensions.iconSizeSmall())
+                modifier = Modifier.size(20.dp)
             )
         }
     }
@@ -1004,16 +983,16 @@ private fun GoalItem(text: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = AppDimensions.paddingExtraSmall()),
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.Top
     ) {
         Icon(
-            Icons.Default.Check,
+            Icons.Default.CheckCircle,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(AppDimensions.iconSizeSmall())
+            modifier = Modifier.size(18.dp)
         )
-        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text,
             style = MaterialTheme.typography.bodyMedium,
@@ -1033,7 +1012,7 @@ private fun HelpItem(title: String, description: String) {
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
-        Spacer(modifier = Modifier.height(AppDimensions.paddingExtraSmall()))
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             description,
             style = MaterialTheme.typography.bodySmall,

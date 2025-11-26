@@ -15,7 +15,13 @@ import kotlinx.coroutines.launch
 
 sealed class NotificationsUiState {
     object Loading: NotificationsUiState()
-    data class Success(val data: List<AppNotification>, val offline: Boolean = false): NotificationsUiState()
+    data class Success(
+        val data: List<AppNotification>, 
+        val offline: Boolean = false,
+        val hasMore: Boolean = false,
+        val isLoadingMore: Boolean = false,
+        val totalRecords: Int = 0
+    ): NotificationsUiState()
     data class Error(val message: String): NotificationsUiState()
 }
 
@@ -32,10 +38,19 @@ class NotificationsViewModel(app: Application): AndroidViewModel(app) {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
+    // Pagination
+    private val recordsPerPage = 10
+    private var currentPage = 1
+    private var allLoadedRecords = mutableListOf<AppNotification>()
+    private var allAvailableRecords = listOf<AppNotification>()
+
     init { refresh() }
 
     fun refresh() {
         _isRefreshing.value = true
+        currentPage = 1
+        allLoadedRecords.clear()
+        allAvailableRecords = emptyList()
 
         // Keep current state while refreshing - following CropHealth pattern
         val currentState = _state.value
@@ -46,7 +61,22 @@ class NotificationsViewModel(app: Application): AndroidViewModel(app) {
         viewModelScope.launch {
             try {
                 val (notifications, offline) = repo.notifications()
-                _state.value = NotificationsUiState.Success(notifications, offline)
+                
+                // Client-side pagination logic
+                allAvailableRecords = notifications.sortedByDescending { it.createdAt }
+                val totalRecords = allAvailableRecords.size
+                
+                // Load first page
+                val firstPageRecords = allAvailableRecords.take(recordsPerPage)
+                allLoadedRecords.addAll(firstPageRecords)
+                
+                _state.value = NotificationsUiState.Success(
+                    data = allLoadedRecords.toList(), 
+                    offline = offline,
+                    hasMore = allLoadedRecords.size < totalRecords,
+                    totalRecords = totalRecords,
+                    isLoadingMore = false
+                )
             } catch (e: Exception) {
                 // Only show error if we have no existing data - graceful degradation
                 if (currentState !is NotificationsUiState.Success) {
@@ -55,6 +85,40 @@ class NotificationsViewModel(app: Application): AndroidViewModel(app) {
                 // If we have existing data, keep it visible and just stop refreshing
             } finally {
                 _isRefreshing.value = false
+            }
+        }
+    }
+
+    fun loadMore() {
+        val currentState = _state.value
+        if (currentState is NotificationsUiState.Success && 
+            currentState.hasMore && 
+            !currentState.isLoadingMore) {
+            
+            _state.value = currentState.copy(isLoadingMore = true)
+            
+            viewModelScope.launch {
+                try {
+                    // Simulate network delay for better UX
+                    kotlinx.coroutines.delay(500)
+                    
+                    val startIndex = currentPage * recordsPerPage
+                    val endIndex = kotlin.math.min(startIndex + recordsPerPage, allAvailableRecords.size)
+                    
+                    if (startIndex < allAvailableRecords.size) {
+                        val nextPageRecords = allAvailableRecords.subList(startIndex, endIndex)
+                        allLoadedRecords.addAll(nextPageRecords)
+                        currentPage++
+                    }
+                    
+                    _state.value = currentState.copy(
+                        data = allLoadedRecords.toList(),
+                        hasMore = allLoadedRecords.size < allAvailableRecords.size,
+                        isLoadingMore = false
+                    )
+                } catch (e: Exception) {
+                    _state.value = currentState.copy(isLoadingMore = false)
+                }
             }
         }
     }

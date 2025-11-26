@@ -2,6 +2,7 @@ package com.zynt.sumviltadconnect.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -42,6 +43,8 @@ import com.zynt.sumviltadconnect.data.model.CropHealthComment
 import com.zynt.sumviltadconnect.ui.components.BrandProgressIndicator
 import com.zynt.sumviltadconnect.ui.components.FullScreenSkeleton
 import com.zynt.sumviltadconnect.ui.theme.AppDimensions
+import com.zynt.sumviltadconnect.ui.theme.rememberWindowSize
+import com.zynt.sumviltadconnect.ui.theme.WindowSize
 import com.zynt.sumviltadconnect.ui.viewmodel.CropHealthUiState
 import com.zynt.sumviltadconnect.ui.viewmodel.CropHealthViewModel
 import com.zynt.sumviltadconnect.ui.viewmodel.CropHealthCommentsViewModel
@@ -65,53 +68,68 @@ fun CropHealthScreen(
     val state by vm.state.collectAsState()
     var showDeleteDialog by remember { mutableStateOf<CropHealthRecord?>(null) }
     var showCommentsDialog by remember { mutableStateOf<CropHealthRecord?>(null) }
+    val windowSize = rememberWindowSize()
 
     // Enhanced UI with better visual design
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                        MaterialTheme.colorScheme.surface
-                    )
-                )
-            )
+            .background(MaterialTheme.colorScheme.surface)
     ) {
-        // Enhanced Header
-        EnhancedCropHealthHeader(
-            onRefresh = { vm.refresh() },
-            onNewDetection = onNewDetection
-        )
-
-        // Content
-        when (val currentState = state) {
-            is CropHealthUiState.Loading -> EnhancedLoadingState()
-            is CropHealthUiState.Error -> EnhancedErrorState(
-                message = currentState.message,
-                onRetry = { vm.refresh() }
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Enhanced Header
+            EnhancedCropHealthHeader(
+                onRefresh = { vm.refresh() }
             )
-            is CropHealthUiState.Success -> {
-                val list = currentState.data
-                if (list.isEmpty()) {
-                    EnhancedEmptyState(onNewDetection = onNewDetection)
-                } else {
-                    EnhancedCropHealthList(
-                        records = list,
-                        onRecordClick = { record ->
-                            // Navigate to detail screen instead of showing dialog
-                            // TODO: You'll need to pass the record data via navigation
-                            // For now, storing in a shared ViewModel or passing serialized data
-                            navController?.navigate("crop_health_detail/${record.id}")
-                        },
-                        onDeleteClick = { showDeleteDialog = it },
-                        paginationState = currentState,
-                        vm = vm,
-                        onCommentsClick = { showCommentsDialog = it }
+
+            // Content
+            Box(modifier = Modifier.weight(1f)) {
+                when (val currentState = state) {
+                    is CropHealthUiState.Loading -> EnhancedLoadingState()
+                    is CropHealthUiState.Error -> EnhancedErrorState(
+                        message = currentState.message,
+                        onRetry = { vm.refresh() }
                     )
+                    is CropHealthUiState.Success -> {
+                        val list = currentState.data
+                        if (list.isEmpty()) {
+                            EnhancedEmptyState(onNewDetection = onNewDetection)
+                        } else {
+                            EnhancedCropHealthList(
+                                records = list,
+                                onRecordClick = { record ->
+                                    // Navigate to detail screen instead of showing dialog
+                                    // TODO: You'll need to pass the record data via navigation
+                                    // For now, storing in a shared ViewModel or passing serialized data
+                                    navController?.navigate("crop_health_detail/${record.id}")
+                                },
+                                onDeleteClick = { showDeleteDialog = it },
+                                paginationState = currentState,
+                                vm = vm,
+                                onCommentsClick = { showCommentsDialog = it }
+                            )
+                        }
+                    }
                 }
             }
+        }
+
+        // Floating Action Button
+        FloatingActionButton(
+            onClick = onNewDetection,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(AppDimensions.paddingLarge()),
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            elevation = FloatingActionButtonDefaults.elevation(defaultElevation = AppDimensions.paddingSmall())
+        ) {
+            Icon(
+                Icons.Default.AddAPhoto,
+                contentDescription = "New Detection"
+            )
         }
     }
 
@@ -138,79 +156,61 @@ fun CropHealthScreen(
 
 @Composable
 private fun EnhancedCropHealthHeader(
-    onRefresh: () -> Unit,
-    onNewDetection: () -> Unit
+    onRefresh: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(AppDimensions.paddingMedium()),
+            .padding(horizontal = AppDimensions.paddingMedium(), vertical = AppDimensions.paddingSmall()),
         elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingSmall()),
         shape = RoundedCornerShape(AppDimensions.paddingLarge())
     ) {
-        Box {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
-                                MaterialTheme.colorScheme.tertiary.copy(alpha = 0.6f)
-                            )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.tertiary
                         )
                     )
-                    .padding(AppDimensions.paddingLarge())
+                )
+                .padding(AppDimensions.paddingLarge())
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "Crop Health Records",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "Track your rice crop detections",
-                            fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.8f)
-                        )
-                    }
+                Column {
+                    Text(
+                        text = "Crop Health Records",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Track your rice crop detections",
+                        fontSize = 14.sp,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                }
 
-                    Row {
-                        IconButton(
-                            onClick = onRefresh,
-                            modifier = Modifier
-                                .background(
-                                    Color.White.copy(alpha = 0.2f),
-                                    CircleShape
-                                )
-                        ) {
-                            Icon(
-                                Icons.Default.Refresh,
-                                contentDescription = "Refresh",
-                                tint = Color.White
+                Row {
+                    IconButton(
+                        onClick = onRefresh,
+                        modifier = Modifier
+                            .background(
+                                Color.White.copy(alpha = 0.2f),
+                                CircleShape
                             )
-                        }
-
-                        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
-
-                        FloatingActionButton(
-                            onClick = onNewDetection,
-                            containerColor = Color.White.copy(alpha = 0.9f),
-                            contentColor = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(AppDimensions.iconSizeLarge())
-                        ) {
-                            Icon(
-                                Icons.Default.AddAPhoto,
-                                contentDescription = "New Detection",
-                                modifier = Modifier.size(AppDimensions.iconSizeMedium())
-                            )
-                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = "Refresh",
+                            tint = Color.White
+                        )
                     }
                 }
             }
@@ -391,7 +391,10 @@ private fun EnhancedCropHealthList(
                 .fillMaxSize()
                 .padding(horizontal = AppDimensions.paddingMedium()),
             verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium()),
-            contentPadding = PaddingValues(bottom = AppDimensions.paddingMedium())
+            contentPadding = PaddingValues(
+                top = AppDimensions.paddingMedium(),
+                bottom = AppDimensions.fabSize() + AppDimensions.paddingLarge() // Space for FAB
+            )
         ) {
             item(key = "header") {
                 AnimatedVisibility(
@@ -521,11 +524,18 @@ private fun EnhancedCropHealthItem(
     onDeleteClick: () -> Unit,
     onCommentsClick: (CropHealthRecord) -> Unit = {}
 ) {
+    val isHealthy = record.disease?.contains("healthy", ignoreCase = true) == true ||
+        record.disease?.contains("no disease", ignoreCase = true) == true
+    
     Card(
         modifier = Modifier
             .fillMaxWidth(), // removed overall clickable to avoid intercepting icon taps
         elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
-        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        border = if (!isHealthy) BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f)) else null
     ) {
         Column(
             modifier = Modifier
@@ -539,8 +549,6 @@ private fun EnhancedCropHealthItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Disease status
-                val isHealthy = record.disease?.contains("healthy", ignoreCase = true) == true ||
-                    record.disease?.contains("no disease", ignoreCase = true) == true
                 Surface(
                     color = if (isHealthy) Color(0xFF4CAF50).copy(alpha = 0.1f) else Color(0xFFFF5722).copy(alpha = 0.1f),
                     shape = RoundedCornerShape(AppDimensions.paddingMedium())

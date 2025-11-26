@@ -1,14 +1,13 @@
 package com.zynt.sumviltadconnect.ui.screens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-import com.zynt.sumviltadconnect.ui.theme.AppDimensions
-import com.zynt.sumviltadconnect.ui.theme.WindowSize
-import com.zynt.sumviltadconnect.ui.theme.rememberWindowSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -18,17 +17,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zynt.sumviltadconnect.data.model.IrrigationSchedule
-import com.zynt.sumviltadconnect.ui.viewmodel.IrrigationViewModel
+import com.zynt.sumviltadconnect.ui.theme.AppDimensions
+import com.zynt.sumviltadconnect.ui.theme.WindowSize
+import com.zynt.sumviltadconnect.ui.theme.rememberWindowSize
 import com.zynt.sumviltadconnect.ui.viewmodel.IrrigationUiState
+import com.zynt.sumviltadconnect.ui.viewmodel.IrrigationViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -60,6 +64,10 @@ fun IrrigationScheduleScreen(
     val myRequests by viewModel.myRequests.collectAsState()
     val isLoadingRequests by viewModel.isLoadingRequests.collectAsState()
 
+    // Animation state
+    var isVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { isVisible = true }
+
     // Show error snackbar
     val currentState = state
     if (currentState is IrrigationUiState.Error) {
@@ -80,150 +88,250 @@ fun IrrigationScheduleScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(AppDimensions.paddingMedium()),
-            verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium()),
-            state = rememberLazyListState()
+                .background(MaterialTheme.colorScheme.background),
+            state = rememberLazyListState(),
+            contentPadding = PaddingValues(bottom = 80.dp) // Space for FAB
         ) {
-        // Header
-        item {
-            IrrigationHeader()
-        }
-
-        // Show loading state
-        if (currentState is IrrigationUiState.Loading) {
+            // Header
             item {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+                EnhancedIrrigationHeader()
+                Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
             }
-        }
 
-        // Show error state
-        if (currentState is IrrigationUiState.Error) {
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(AppDimensions.paddingMedium()),
-                        horizontalAlignment = Alignment.CenterHorizontally
+            // Show loading state
+            if (currentState is IrrigationUiState.Loading) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Error,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
-                        Text(
-                            text = currentState.message,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
-                        Button(
-                            onClick = { viewModel.loadIrrigationSchedules() }
-                        ) {
-                            Text("Retry")
-                        }
+                        CircularProgressIndicator()
                     }
                 }
             }
-        }
 
-        // Show content when data is available
-        if (currentState is IrrigationUiState.Success || upcomingSchedules.isNotEmpty() || pastSchedules.isNotEmpty()) {
-            // Next Irrigation Alert
-            nextIrrigation?.let { next ->
+            // Show error state
+            if (currentState is IrrigationUiState.Error) {
                 item {
-                    NextIrrigationCard(
-                        schedule = next,
-                        viewModel = viewModel
+                    EnhancedErrorState(
+                        message = currentState.message,
+                        onRetry = { viewModel.loadIrrigationSchedules() }
                     )
                 }
             }
 
-            // Responsive Layout
-            if (windowSize == WindowSize.EXPANDED) {
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium()),
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        // Left Column: Schedules
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
+            // Show content when data is available
+            if (currentState is IrrigationUiState.Success || upcomingSchedules.isNotEmpty() || pastSchedules.isNotEmpty()) {
+                // Next Irrigation Alert
+                nextIrrigation?.let { next ->
+                    item {
+                        AnimatedVisibility(
+                            visible = isVisible,
+                            enter = slideInVertically(
+                                animationSpec = tween(300, easing = FastOutSlowInEasing)
+                            ) + fadeIn(animationSpec = tween(300))
                         ) {
-                            UpcomingIrrigationSection(
-                                schedules = upcomingSchedules,
-                                viewModel = viewModel
-                            )
-                            
-                            if (pastSchedules.isNotEmpty()) {
-                                PastIrrigationSection(
-                                    schedules = pastSchedules,
+                            Column(modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium())) {
+                                NextIrrigationCard(
+                                    schedule = next,
                                     viewModel = viewModel
+                                )
+                                Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
+                            }
+                        }
+                    }
+                }
+
+                // Responsive Layout
+                if (windowSize == WindowSize.EXPANDED) {
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = AppDimensions.paddingMedium()),
+                            horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium()),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            // Left Column: Schedules
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                if (upcomingSchedules.isNotEmpty()) {
+                                    Text(
+                                        text = "Upcoming Irrigation",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(bottom = AppDimensions.paddingMedium())
+                                    )
+                                    
+                                    upcomingSchedules.forEachIndexed { index, schedule ->
+                                        EnhancedScheduleCard(
+                                            schedule = schedule,
+                                            viewModel = viewModel,
+                                            isUpcoming = true,
+                                            animationDelay = index * 50
+                                        )
+                                        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+                                    }
+                                }
+                                
+                                if (pastSchedules.isNotEmpty()) {
+                                    Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
+                                    Text(
+                                        text = "Irrigation History",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(bottom = AppDimensions.paddingMedium())
+                                    )
+                                    
+                                    pastSchedules.forEachIndexed { index, schedule ->
+                                        EnhancedScheduleCard(
+                                            schedule = schedule,
+                                            viewModel = viewModel,
+                                            isUpcoming = false,
+                                            animationDelay = (index + upcomingSchedules.size) * 50
+                                        )
+                                        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+                                    }
+                                }
+                            }
+                            
+                            // Right Column: Requests & Info
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
+                            ) {
+                                MyRequestsSection(
+                                    requests = myRequests,
+                                    isLoading = isLoadingRequests,
+                                    onRefresh = { viewModel.loadMyRequests() }
+                                )
+                                
+                                InfoCard()
+                            }
+                        }
+                    }
+                } else {
+                    // Upcoming Irrigation Section
+                    if (upcomingSchedules.isNotEmpty()) {
+                        item {
+                            Column(modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium())) {
+                                Text(
+                                    text = "Upcoming Irrigation",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(bottom = AppDimensions.paddingMedium())
                                 )
                             }
                         }
                         
-                        // Right Column: Requests & Info
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
-                        ) {
+                        itemsIndexed(upcomingSchedules) { index, schedule ->
+                            Column(modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium())) {
+                                EnhancedScheduleCard(
+                                    schedule = schedule,
+                                    viewModel = viewModel,
+                                    isUpcoming = true,
+                                    animationDelay = index * 50
+                                )
+                                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+                            }
+                        }
+                        
+                        // Pagination for upcoming
+                        if (upcomingCurrentPage < upcomingTotalPages - 1) {
+                            item {
+                                Button(
+                                    onClick = { viewModel.loadMoreUpcoming() },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = AppDimensions.paddingMedium()),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary
+                                    )
+                                ) {
+                                    Text("Load More")
+                                }
+                                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+                            }
+                        }
+                    } else if (currentState is IrrigationUiState.Success) {
+                        item {
+                            EmptyStateMessage(
+                                icon = Icons.Outlined.DateRange,
+                                message = "No upcoming irrigation scheduled",
+                                description = "Check back later or contact your local irrigation manager"
+                            )
+                        }
+                    }
+
+                    // My Requests Section
+                    item {
+                        Column(modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium())) {
+                            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
                             MyRequestsSection(
                                 requests = myRequests,
                                 isLoading = isLoadingRequests,
                                 onRefresh = { viewModel.loadMyRequests() }
                             )
-                            
+                            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+                        }
+                    }
+
+                    // Past Irrigation History Section
+                    if (pastSchedules.isNotEmpty()) {
+                        item {
+                            Column(modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium())) {
+                                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+                                Text(
+                                    text = "Irrigation History",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(bottom = AppDimensions.paddingMedium())
+                                )
+                            }
+                        }
+                        
+                        itemsIndexed(pastSchedules) { index, schedule ->
+                            Column(modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium())) {
+                                EnhancedScheduleCard(
+                                    schedule = schedule,
+                                    viewModel = viewModel,
+                                    isUpcoming = false,
+                                    animationDelay = (index + upcomingSchedules.size) * 50
+                                )
+                                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+                            }
+                        }
+                        
+                        // Pagination for past
+                        if (pastCurrentPage < pastTotalPages - 1) {
+                            item {
+                                Button(
+                                    onClick = { viewModel.loadMorePast() },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = AppDimensions.paddingMedium()),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.secondary
+                                    )
+                                ) {
+                                    Text("Load More History")
+                                }
+                                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+                            }
+                        }
+                    }
+
+                    // Info Card
+                    item {
+                        Column(modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium())) {
                             InfoCard()
+                            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
                         }
                     }
                 }
-            } else {
-                // Upcoming Irrigation Section
-                item {
-                    UpcomingIrrigationSection(
-                        schedules = upcomingSchedules,
-                        viewModel = viewModel
-                    )
-                }
-
-                // Past Irrigation History Section
-                if (pastSchedules.isNotEmpty()) {
-                    item {
-                        PastIrrigationSection(
-                            schedules = pastSchedules,
-                            viewModel = viewModel
-                        )
-                    }
-                }
-
-                // My Requests Section
-                item {
-                    MyRequestsSection(
-                        requests = myRequests,
-                        isLoading = isLoadingRequests,
-                        onRefresh = { viewModel.loadMyRequests() }
-                    )
-                }
-
-                // Info Card
-                item {
-                    InfoCard()
-                }
             }
         }
-    }
 
         // Floating Action Button for Request (moved to bottom-left)
         FloatingActionButton(
@@ -272,35 +380,264 @@ fun IrrigationScheduleScreen(
 }
 
 @Composable
-private fun IrrigationHeader() {
+private fun EnhancedIrrigationHeader() {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingExtraSmall())
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = AppDimensions.paddingMedium()),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingSmall()),
+        shape = RoundedCornerShape(AppDimensions.paddingLarge())
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(AppDimensions.paddingLarge()),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.primaryContainer
+                        )
+                    )
+                )
+                .padding(AppDimensions.paddingLarge())
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "Irrigation Schedule",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Text(
+                        text = "Manage your water resources",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Filled.WaterDrop,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun EnhancedErrorState(message: String, onRetry: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(AppDimensions.paddingMedium()),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
+    ) {
+        Column(
+            modifier = Modifier.padding(AppDimensions.paddingLarge()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = Icons.Filled.WaterDrop,
+                imageVector = Icons.Filled.ErrorOutline,
                 contentDescription = null,
-                modifier = Modifier.size(AppDimensions.iconSizeLarge()),
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(48.dp)
             )
-            Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
             Text(
-                text = "Irrigation Schedule",
-                style = MaterialTheme.typography.headlineSmall,
+                text = "Something went wrong",
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onErrorContainer
             )
+            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f),
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+            Button(
+                onClick = onRetry,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text("Retry", color = MaterialTheme.colorScheme.onError)
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyStateMessage(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    message: String,
+    description: String
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(AppDimensions.paddingLarge()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+        )
+        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun EnhancedScheduleCard(
+    schedule: IrrigationSchedule,
+    viewModel: IrrigationViewModel,
+    isUpcoming: Boolean,
+    animationDelay: Int = 0
+) {
+    val isToday = viewModel.isToday(schedule.date)
+    
+    var isVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(animationDelay.toLong())
+        isVisible = true
+    }
+
+    val scale by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0.8f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "scale"
+    )
+
+    val alpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = tween(400, easing = FastOutSlowInEasing),
+        label = "alpha"
+    )
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .scale(scale)
+            .graphicsLayer { this.alpha = alpha },
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isToday) {
+                MaterialTheme.colorScheme.tertiaryContainer
+            } else {
+                MaterialTheme.colorScheme.surface
+            }
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
+        border = if (isToday) BorderStroke(1.dp, Color(0xFFFF9800)) else null
+    ) {
+        Column(
+            modifier = Modifier.padding(AppDimensions.paddingMedium())
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(AppDimensions.paddingSmall()),
+                        color = if (isUpcoming) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.WaterDrop,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .padding(8.dp),
+                            tint = if (isUpcoming) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
+                    Column {
+                        Text(
+                            text = viewModel.formatDate(schedule.date),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.LocationOn,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = schedule.location,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = " • ${viewModel.getDaysUntil(schedule.date)}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
+                StatusBadge(
+                    status = schedule.status,
+                    isToday = isToday,
+                    isPast = !isUpcoming
+                )
+            }
+
+            schedule.notes?.let { notes ->
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(AppDimensions.paddingSmall())
+                ) {
+                    Text(
+                        text = "Note: $notes",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(AppDimensions.paddingSmall())
+                    )
+                }
+            }
         }
     }
 }
@@ -403,343 +740,6 @@ private fun NextIrrigationCard(
 }
 
 @Composable
-private fun UpcomingIrrigationSection(
-    schedules: List<IrrigationSchedule>,
-    viewModel: IrrigationViewModel
-) {
-    val upcomingCurrentPage by viewModel.upcomingCurrentPage.collectAsState()
-    val upcomingTotalPages by viewModel.upcomingTotalPages.collectAsState()
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
-        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingExtraSmall())
-    ) {
-        Column {
-            // Header
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            listOf(
-                                Color(0xFF4CAF50).copy(alpha = 0.1f),
-                                Color(0xFF009688).copy(alpha = 0.1f)
-                            )
-                        )
-                    )
-                    .padding(AppDimensions.paddingLarge())
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.DateRange,
-                        contentDescription = null,
-                        modifier = Modifier.size(AppDimensions.iconSizeMedium()),
-                        tint = Color(0xFF4CAF50)
-                    )
-                    Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
-                    Column {
-                        Text(
-                            text = "Upcoming Irrigation",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "${schedules.size} scheduled irrigation${if (schedules.size != 1) "s" else ""} for your area",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
-                    }
-                }
-            }
-
-            // Content
-            if (schedules.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(AppDimensions.iconSizeLarge()),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.DateRange,
-                        contentDescription = null,
-                        modifier = Modifier.size(AppDimensions.buttonHeight()),
-                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                    )
-                    Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
-                    Text(
-                        text = "No upcoming irrigation scheduled",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
-                    Text(
-                        text = "Check back later or contact your local irrigation manager",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            } else {
-                Column(
-                    modifier = Modifier.padding(AppDimensions.paddingLarge()),
-                    verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
-                ) {
-                    schedules.forEach { schedule ->
-                        IrrigationScheduleItem(
-                            schedule = schedule,
-                            viewModel = viewModel,
-                            isUpcoming = true
-                        )
-                    }
-
-                    // Pagination control
-                    if (upcomingCurrentPage < upcomingTotalPages - 1) {
-                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
-                        Button(
-                            onClick = { viewModel.loadMoreUpcoming() },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF4CAF50)
-                            )
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.KeyboardArrowDown,
-                                contentDescription = null,
-                                modifier = Modifier.size(AppDimensions.iconSizeSmall())
-                            )
-                            Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
-                            Text("Load More (${upcomingCurrentPage + 1}/${upcomingTotalPages})")
-                        }
-                    } else if (upcomingTotalPages > 1) {
-                        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
-                        Text(
-                            text = "Showing all ${schedules.size} irrigation schedules",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun PastIrrigationSection(
-    schedules: List<IrrigationSchedule>,
-    viewModel: IrrigationViewModel
-) {
-    val pastCurrentPage by viewModel.pastCurrentPage.collectAsState()
-    val pastTotalPages by viewModel.pastTotalPages.collectAsState()
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
-        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingExtraSmall())
-    ) {
-        Column {
-            // Header
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            listOf(
-                                Color(0xFF607D8B).copy(alpha = 0.1f),
-                                Color(0xFF455A64).copy(alpha = 0.1f)
-                            )
-                        )
-                    )
-                    .padding(AppDimensions.paddingLarge())
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.History,
-                        contentDescription = null,
-                        modifier = Modifier.size(AppDimensions.iconSizeMedium()),
-                        tint = Color(0xFF607D8B)
-                    )
-                    Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
-                    Column {
-                        Text(
-                            text = "Irrigation History",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "Past ${schedules.size} irrigation record${if (schedules.size != 1) "s" else ""} for your area",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
-                    }
-                }
-            }
-
-            // Content
-            Column(
-                modifier = Modifier.padding(AppDimensions.paddingLarge()),
-                verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
-            ) {
-                schedules.forEach { schedule ->
-                    IrrigationScheduleItem(
-                        schedule = schedule,
-                        viewModel = viewModel,
-                        isUpcoming = false
-                    )
-                }
-
-                // Pagination control
-                if (pastCurrentPage < pastTotalPages - 1) {
-                    Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
-                    Button(
-                        onClick = { viewModel.loadMorePast() },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF607D8B)
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.KeyboardArrowDown,
-                            contentDescription = null,
-                            modifier = Modifier.size(AppDimensions.iconSizeSmall())
-                        )
-                        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
-                        Text("Load More (${pastCurrentPage + 1}/${pastTotalPages})")
-                    }
-                } else if (pastTotalPages > 1) {
-                    Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
-                    Text(
-                        text = "Showing all ${schedules.size} past irrigation records",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun IrrigationScheduleItem(
-    schedule: IrrigationSchedule,
-    viewModel: IrrigationViewModel,
-    isUpcoming: Boolean
-) {
-    val isToday = viewModel.isToday(schedule.date)
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isToday) {
-                MaterialTheme.colorScheme.tertiaryContainer
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            }
-        ),
-        border = if (isToday) BorderStroke(AppDimensions.paddingExtraSmall(), Color(0xFFFF9800)) else null
-    ) {
-        Column(
-            modifier = Modifier.padding(AppDimensions.paddingMedium())
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Card(
-                        shape = RoundedCornerShape(AppDimensions.paddingSmall()),
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (isUpcoming) Color(0xFF2196F3).copy(alpha = 0.1f) else Color(0xFF607D8B).copy(alpha = 0.1f)
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.WaterDrop,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(AppDimensions.iconSizeLarge())
-                                .padding(AppDimensions.paddingSmall()),
-                            tint = if (isUpcoming) Color(0xFF2196F3) else Color(0xFF607D8B)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
-                    Column {
-                        Text(
-                            text = viewModel.formatDate(schedule.date),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.LocationOn,
-                                contentDescription = null,
-                                modifier = Modifier.size(AppDimensions.paddingMedium()),
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                            )
-                            Spacer(modifier = Modifier.width(AppDimensions.paddingExtraSmall()))
-                            Text(
-                                text = schedule.location,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                            )
-                            Text(
-                                text = " • ${viewModel.getDaysUntil(schedule.date)}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                            )
-                        }
-                    }
-                }
-
-                StatusBadge(
-                    status = schedule.status,
-                    isToday = isToday,
-                    isPast = !isUpcoming
-                )
-            }
-
-            schedule.notes?.let { notes ->
-                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
-                    ),
-                    shape = RoundedCornerShape(AppDimensions.paddingSmall())
-                ) {
-                    Text(
-                        text = "Note: $notes",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(AppDimensions.paddingSmall())
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun StatusBadge(
     status: String,
     isToday: Boolean,
@@ -762,25 +762,25 @@ private fun StatusBadge(
     Card(
         shape = RoundedCornerShape(AppDimensions.paddingExtraSmall()),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        border = BorderStroke(AppDimensions.paddingExtraSmall(), textColor.copy(alpha = 0.3f))
+        border = BorderStroke(1.dp, textColor.copy(alpha = 0.3f))
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = AppDimensions.paddingExtraSmall()),
+            modifier = Modifier.padding(horizontal = AppDimensions.paddingSmall(), vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (isToday) {
                 Icon(
                     imageVector = Icons.Filled.AccessTime,
                     contentDescription = null,
-                    modifier = Modifier.size(AppDimensions.paddingMedium()),
+                    modifier = Modifier.size(12.dp),
                     tint = textColor
                 )
-                Spacer(modifier = Modifier.width(AppDimensions.paddingExtraSmall()))
+                Spacer(modifier = Modifier.width(4.dp))
             }
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
                 color = textColor
             )
         }
@@ -795,7 +795,7 @@ private fun InfoCard() {
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
-        border = BorderStroke(AppDimensions.paddingExtraSmall(), MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
     ) {
         Row(
             modifier = Modifier.padding(AppDimensions.paddingLarge()),

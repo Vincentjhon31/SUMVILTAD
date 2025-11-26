@@ -42,6 +42,8 @@ import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
 import androidx.navigation.NavController
 import com.zynt.sumviltadconnect.ui.theme.AppDimensions
+import com.zynt.sumviltadconnect.ui.theme.WindowSize
+import com.zynt.sumviltadconnect.ui.theme.rememberWindowSize
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -53,14 +55,19 @@ fun EventsScreen(navController: NavController? = null, vm: EventsViewModel = vie
     val fastAnimation = 150.milliseconds
     val standardAnimation = 200.milliseconds
     val slowAnimation = 250.milliseconds
+    val windowSize = rememberWindowSize()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
         when (val currentState = state) {
             is EventsUiState.Loading -> {
-                EventsLoadingSkeleton()
+                EnhancedEventsLoadingSkeleton()
             }
             is EventsUiState.Error -> {
-                EventsErrorState(
+                EnhancedErrorState(
                     message = currentState.message,
                     onRetry = { vm.refresh() }
                 )
@@ -85,11 +92,11 @@ fun EventsScreen(navController: NavController? = null, vm: EventsViewModel = vie
 }
 
 @Composable
-private fun EventsLoadingSkeleton() {
+private fun EnhancedEventsLoadingSkeleton() {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(AppDimensions.paddingMedium()),
+        verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
     ) {
         // Header skeleton
         item {
@@ -97,7 +104,7 @@ private fun EventsLoadingSkeleton() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(AppDimensions.paddingLarge())
             ) {
                 Box(
                     modifier = Modifier
@@ -113,7 +120,7 @@ private fun EventsLoadingSkeleton() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
             ) {
                 Box(
                     modifier = Modifier
@@ -129,7 +136,7 @@ private fun EventsLoadingSkeleton() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(140.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
             ) {
                 Box(
                     modifier = Modifier
@@ -142,53 +149,51 @@ private fun EventsLoadingSkeleton() {
 }
 
 @Composable
-private fun EventsErrorState(
-    message: String,
-    onRetry: () -> Unit
-) {
-    Column(
+private fun EnhancedErrorState(message: String, onRetry: () -> Unit) {
+    Card(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .fillMaxWidth()
+            .padding(AppDimensions.paddingMedium()),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
     ) {
-        Icon(
-            imageVector = Icons.Outlined.EventBusy,
-            contentDescription = null,
-            modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colorScheme.error
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Failed to Load Events",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = onRetry,
-            modifier = Modifier.animateContentSize()
+        Column(
+            modifier = Modifier.padding(AppDimensions.paddingLarge()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = Icons.Default.Refresh,
+                Icons.Default.Error,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                tint = MaterialTheme.colorScheme.onErrorContainer,
+                modifier = Modifier.size(AppDimensions.iconSizeLarge())
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Retry")
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+            Text(
+                text = "Error loading events",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+            Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
+            Text(
+                text = message,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
+            Button(
+                onClick = onRetry,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Icon(Icons.Default.Refresh, contentDescription = null)
+                Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
+                Text("Retry")
+            }
         }
     }
 }
@@ -207,26 +212,28 @@ private fun EventsSuccessContent(
     val swipeRefreshState = rememberSwipeRefreshState(state.isRefreshing)
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Header with gradient and stats
-        EventsHeader(
-            totalEvents = state.events.size,
-            upcomingCount = state.events.count { event ->
-                EventsViewModel().getEventStatus(event) == EventStatus.UPCOMING
-            },
-            ongoingCount = state.events.count { event ->
-                EventsViewModel().getEventStatus(event) == EventStatus.ONGOING
-            }
-        )
-
         SwipeRefresh(
             state = swipeRefreshState,
             onRefresh = onRefresh
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(horizontal = AppDimensions.paddingMedium()),
+                verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingMedium())
             ) {
+                // Header with gradient and stats
+                item {
+                    EnhancedEventsHeader(
+                        totalEvents = state.events.size,
+                        upcomingCount = state.events.count { event ->
+                            EventsViewModel().getEventStatus(event) == EventStatus.UPCOMING
+                        },
+                        ongoingCount = state.events.count { event ->
+                            EventsViewModel().getEventStatus(event) == EventStatus.ONGOING
+                        }
+                    )
+                }
+
                 // Search and filters
                 item {
                     EventsFiltersCard(
@@ -267,14 +274,14 @@ private fun EventsSuccessContent(
                         text = "${state.filteredEvents.size} ${state.filterType.displayName}",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(vertical = AppDimensions.paddingSmall())
                     )
                 }
 
                 // Events
                 if (state.filteredEvents.isEmpty()) {
                     item {
-                        EmptyEventsState(
+                        EnhancedEmptyEventsState(
                             hasSearch = state.searchQuery.isNotBlank(),
                             onClearFilters = {
                                 onSearchChange("")
@@ -305,7 +312,7 @@ private fun EventsSuccessContent(
                                 )
                             )
                         ) {
-                            EventCard(
+                            EnhancedEventCard(
                                 event = event,
                                 participationState = state.participationStates[event.id],
                                 onParticipate = onParticipate,
@@ -318,7 +325,7 @@ private fun EventsSuccessContent(
 
                 // Bottom padding
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
                 }
             }
         }
@@ -326,7 +333,7 @@ private fun EventsSuccessContent(
 }
 
 @Composable
-private fun EventsHeader(
+private fun EnhancedEventsHeader(
     totalEvents: Int,
     upcomingCount: Int,
     ongoingCount: Int
@@ -334,36 +341,37 @@ private fun EventsHeader(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(16.dp)
+            .padding(vertical = AppDimensions.paddingSmall()),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingSmall()),
+        shape = RoundedCornerShape(AppDimensions.paddingLarge())
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
                     Brush.horizontalGradient(
-                        listOf(
-                            Color(0xFF10B981), // Emerald
-                            Color(0xFF14B8A6)  // Teal
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.tertiary
                         )
                     )
                 )
-                .padding(20.dp)
+                .padding(AppDimensions.paddingLarge())
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Event,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(AppDimensions.iconSizeMedium())
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
                         Text(
                             text = "Farming Events",
                             style = MaterialTheme.typography.headlineMedium,
@@ -372,7 +380,7 @@ private fun EventsHeader(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
 
                     Text(
                         text = "Stay updated with workshops, training sessions, and community gatherings",
@@ -381,8 +389,10 @@ private fun EventsHeader(
                     )
                 }
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(AppDimensions.paddingSmall())
                 ) {
                     StatCard(
                         label = "Total",
@@ -391,10 +401,6 @@ private fun EventsHeader(
                     StatCard(
                         label = "Upcoming",
                         value = upcomingCount.toString()
-                    )
-                    StatCard(
-                        label = "Live",
-                        value = ongoingCount.toString()
                     )
                 }
             }
@@ -408,8 +414,8 @@ private fun StatCard(
     value: String
 ) {
     Card(
-        modifier = Modifier.size(64.dp),
-        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.size(AppDimensions.fabSize()),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusSmall()),
         colors = CardDefaults.cardColors(
             containerColor = Color.White.copy(alpha = 0.2f)
         )
@@ -447,10 +453,11 @@ private fun EventsFiltersCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation())
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(AppDimensions.paddingMedium())
         ) {
             // Search field
             OutlinedTextField(
@@ -475,10 +482,10 @@ private fun EventsFiltersCard(
                     }
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium())
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -488,7 +495,7 @@ private fun EventsFiltersCard(
                 // Filter chips
                 LazyRow(
                     modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingSmall())
                 ) {
                     items(EventFilter.values()) { filter ->
                         FilterChip(
@@ -549,7 +556,7 @@ private fun NotificationCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
@@ -557,17 +564,17 @@ private fun NotificationCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(AppDimensions.paddingMedium()),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.CheckCircle,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(AppDimensions.iconSizeSmall())
             )
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(AppDimensions.paddingMedium()))
 
             Text(
                 text = message,
@@ -588,14 +595,14 @@ private fun NotificationCard(
 }
 
 @Composable
-private fun EmptyEventsState(
+private fun EnhancedEmptyEventsState(
     hasSearch: Boolean,
     onClearFilters: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(32.dp),
+            .padding(AppDimensions.paddingExtraLarge()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
@@ -605,7 +612,7 @@ private fun EmptyEventsState(
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
         Text(
             text = if (hasSearch) "No events match your search" else "No events available",
@@ -613,7 +620,7 @@ private fun EmptyEventsState(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
 
         Text(
             text = if (hasSearch)
@@ -625,7 +632,7 @@ private fun EmptyEventsState(
         )
 
         if (hasSearch) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
 
             Button(onClick = onClearFilters) {
                 Text("Clear filters")
@@ -635,7 +642,7 @@ private fun EmptyEventsState(
 }
 
 @Composable
-private fun EventCard(
+private fun EnhancedEventCard(
     event: Event,
     participationState: ParticipationState?,
     onParticipate: (Int, String) -> Unit,
@@ -655,7 +662,8 @@ private fun EventCard(
                     navController?.navigate("eventDetails/${event.id}")
                 }
             ),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusMedium()),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation()),
         colors = CardDefaults.cardColors(
             containerColor = when (status) {
                 EventStatus.ONGOING -> MaterialTheme.colorScheme.secondaryContainer
@@ -671,10 +679,10 @@ private fun EventCard(
             // Calendar date indicator
             Card(
                 modifier = Modifier
-                    .padding(12.dp)
+                    .padding(AppDimensions.paddingMedium())
                     .size(60.dp)
                     .align(Alignment.TopEnd),
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(AppDimensions.cornerRadiusSmall()),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
@@ -717,7 +725,7 @@ private fun EventCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(AppDimensions.paddingMedium())
                     .padding(end = 76.dp) // Account for calendar
             ) {
                 // Title and status badges
@@ -736,16 +744,16 @@ private fun EventCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
 
                 // Status badges
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingSmall())
                 ) {
                     item { StatusBadge(status = status, isHappeningSoon = isHappeningSoon) }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
                 // Event details
                 EventDetailRow(
@@ -759,7 +767,7 @@ private fun EventCard(
                 }
 
                 event.description?.let { description ->
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.paddingSmall()))
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodySmall,
@@ -769,7 +777,7 @@ private fun EventCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
                 // Action buttons
                 Row(
@@ -783,7 +791,7 @@ private fun EventCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(AppDimensions.paddingSmall())) {
                         // Participation button (only for upcoming/ongoing events)
                         if (status == EventStatus.UPCOMING || status == EventStatus.ONGOING) {
                             val currentStatus = participationState?.status ?: event.userParticipation
@@ -842,7 +850,7 @@ private fun StatusBadge(
     }
 
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(AppDimensions.cornerRadiusLarge()),
         color = backgroundColor
     ) {
         Row(
@@ -852,7 +860,7 @@ private fun StatusBadge(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(8.dp),
+                modifier = Modifier.size(AppDimensions.paddingSmall()),
                 tint = textColor
             )
             Spacer(modifier = Modifier.width(6.dp))
@@ -877,10 +885,10 @@ private fun EventDetailRow(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(AppDimensions.iconSizeSmall()),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(AppDimensions.paddingSmall()))
         Text(
             text = text,
             style = MaterialTheme.typography.bodySmall,
@@ -895,7 +903,7 @@ private fun AnimatedParticipationButton(
     isLoading: Boolean,
     onParticipate: (String) -> Unit
 ) {
-    val isAttending = currentStatus == "attending"
+    val isAttending = currentStatus == "attending" || currentStatus == "accepted"
 
     val backgroundColor by animateColorAsState(
         targetValue = if (isAttending)
@@ -929,7 +937,7 @@ private fun AnimatedParticipationButton(
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(AppDimensions.iconSizeSmall()),
                 strokeWidth = 2.dp,
                 color = textColor
             )
@@ -938,9 +946,9 @@ private fun AnimatedParticipationButton(
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(AppDimensions.iconSizeSmall())
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(AppDimensions.paddingExtraSmall()))
                 Text("Attending")
             } else {
                 Text("Attend")

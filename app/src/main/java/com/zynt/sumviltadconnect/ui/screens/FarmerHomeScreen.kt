@@ -245,7 +245,7 @@ fun FarmerHomeScreen(rootNav: NavController, authViewModel: AuthViewModel) {
                     arguments = listOf(androidx.navigation.navArgument("eventId") { type = androidx.navigation.NavType.IntType })
                 ) { backStack ->
                     val id = backStack.arguments?.getInt("eventId") ?: 0
-                    EventDetailsScreen(eventId = id, onBack = { nav.popBackStack() })
+                    EventDetailsScreen(eventId = id, onNavigateBack = { nav.popBackStack() })
                 }
                 composable("notifications") { NotificationsScreen() }
                 composable("settings") { SettingsScreen() }

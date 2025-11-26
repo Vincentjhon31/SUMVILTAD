@@ -91,53 +91,83 @@ fun PersonalInformationScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Profile") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
-        }
-    ) { paddingValues ->
+    val paddingMedium = AppDimensions.paddingMedium()
+    val paddingSmall = AppDimensions.paddingSmall()
+    val paddingLarge = AppDimensions.paddingLarge()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        // Gradient Header Background
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+                .fillMaxWidth()
+                .height(280.dp)
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                            MaterialTheme.colorScheme.surface
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.primaryContainer
                         )
                     )
                 )
+        )
+
+        // Main Content
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
         ) {
-            when {
-                isLoading && userProfile == null -> {
-                    EnhancedLoadingState()
-                }
-                error != null && userProfile == null -> {
-                    EnhancedErrorState(
-                        message = error ?: "Unknown error",
-                        onRetry = { farmerViewModel.fetchUserProfile() }
+            // Custom Top Bar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(horizontal = paddingMedium, vertical = paddingSmall),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = Color.White,
+                        containerColor = Color.White.copy(alpha = 0.2f)
                     )
+                ) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                 }
-                userProfile != null -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(scrollState)
-                            .padding(16.dp)
-                    ) {
+                
+                Spacer(modifier = Modifier.width(paddingMedium))
+                
+                Text(
+                    text = "My Profile",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(paddingSmall))
+
+            // Content Container
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = paddingMedium)
+            ) {
+                when {
+                    isLoading && userProfile == null -> {
+                        EnhancedLoadingState()
+                    }
+                    error != null && userProfile == null -> {
+                        EnhancedErrorState(
+                            message = error ?: "Unknown error",
+                            onRetry = { farmerViewModel.fetchUserProfile() }
+                        )
+                    }
+                    userProfile != null -> {
                         // Enhanced Profile Header
                         EnhancedProfileHeader(
                             firstName = firstName,
@@ -148,7 +178,31 @@ fun PersonalInformationScreen(
                             role = userProfile?.role ?: "user"
                         )
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(paddingLarge))
+
+                        // Edit Profile Button (Top)
+                        AnimatedVisibility(
+                            visible = !isEditMode,
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically()
+                        ) {
+                            Column {
+                                Button(
+                                    onClick = { isEditMode = true },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = Color.White
+                                    )
+                                ) {
+                                    Icon(Icons.Default.Edit, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Edit Profile")
+                                }
+                                Spacer(modifier = Modifier.height(paddingLarge))
+                            }
+                        }
 
                         // Personal Information Section
                         SectionHeader(
@@ -156,7 +210,7 @@ fun PersonalInformationScreen(
                             subtitle = if (isEditMode) "Edit your personal details" else "View your personal details"
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(paddingMedium))
 
                         AnimatedContent(
                             targetState = isEditMode,
@@ -206,7 +260,7 @@ fun PersonalInformationScreen(
                         // Farm Areas Section (only show in view mode)
                         if (!isEditMode) {
                             userProfile?.farmAreas?.let { areas ->
-                                Spacer(modifier = Modifier.height(24.dp))
+                                Spacer(modifier = Modifier.height(paddingLarge))
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -230,7 +284,7 @@ fun PersonalInformationScreen(
                                             containerColor = MaterialTheme.colorScheme.primary,
                                             contentColor = MaterialTheme.colorScheme.onPrimary
                                         ),
-                                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                                     ) {
                                         Icon(
                                             Icons.Default.Add,
@@ -242,7 +296,7 @@ fun PersonalInformationScreen(
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(paddingMedium))
 
                                 if (areas.isNotEmpty()) {
                                     areas.forEach { farmArea ->
@@ -275,14 +329,14 @@ fun PersonalInformationScreen(
                             }
 
                             // Account Activity Section
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(paddingLarge))
 
                             SectionHeader(
                                 title = "Account Activity",
                                 subtitle = "Your account timeline"
                             )
 
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(paddingMedium))
 
                             AccountActivityCard(
                                 createdAt = userProfile?.created_at,
@@ -290,7 +344,7 @@ fun PersonalInformationScreen(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(paddingLarge))
 
                         // Action Buttons
                         AnimatedContent(
@@ -335,12 +389,16 @@ fun PersonalInformationScreen(
                                         },
                                         modifier = Modifier.fillMaxWidth(),
                                         enabled = !isLoading,
-                                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = Color.White
+                                        )
                                     ) {
                                         if (isLoading) {
                                             CircularProgressIndicator(
                                                 modifier = Modifier.size(24.dp),
-                                                color = MaterialTheme.colorScheme.onPrimary,
+                                                color = Color.White,
                                                 strokeWidth = 2.dp
                                             )
                                             Spacer(modifier = Modifier.width(8.dp))
@@ -375,198 +433,188 @@ fun PersonalInformationScreen(
                                     }
                                 }
                             } else {
-                                Button(
-                                    onClick = { isEditMode = true },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-                                ) {
-                                    Icon(Icons.Default.Edit, contentDescription = null)
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Edit Profile")
-                                }
+                                // Edit button moved to top
+                                Spacer(modifier = Modifier.height(1.dp))
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(32.dp))
+                    }
+                    else -> {
+                        // Fallback
+                        FallbackProfileView(
+                            context = context,
+                            onLoadProfile = { farmerViewModel.fetchUserProfile() }
+                        )
                     }
                 }
-                else -> {
-                    // Fallback
-                    FallbackProfileView(
-                        context = context,
-                        onLoadProfile = { farmerViewModel.fetchUserProfile() }
-                    )
-                }
             }
+        }
 
-            // Farm Area Dialog
-            if (showFarmAreaDialog) {
-                FarmAreaDialog(
-                    isEdit = editFarmAreaId != null,
-                    location = farmAreaLocation,
-                    onLocationChange = { farmAreaLocation = it },
-                    size = farmAreaSize,
-                    onSizeChange = { farmAreaSize = it },
-                    isLoading = isLoading,
-                    onSave = {
-                        if (farmAreaLocation.isBlank()) {
-                            errorMessage = "Farm location is required"
-                            showErrorDialog = true
-                            return@FarmAreaDialog
-                        }
-
-                        val sizeValue = farmAreaSize.toDoubleOrNull()
-                        if (sizeValue == null || sizeValue <= 0) {
-                            errorMessage = "Please enter a valid farm size"
-                            showErrorDialog = true
-                            return@FarmAreaDialog
-                        }
-
-                        val currentEditId = editFarmAreaId
-                        if (currentEditId != null) {
-                            farmerViewModel.updateFarmArea(
-                                farmAreaId = currentEditId,
-                                farmLocation = farmAreaLocation,
-                                riceFieldArea = sizeValue,
-                                onSuccess = {
-                                    showFarmAreaDialog = false
-                                    editFarmAreaId = null
-                                    farmAreaLocation = ""
-                                    farmAreaSize = ""
-                                    successMessage = "Farm area updated successfully!"
-                                    showSuccessDialog = true
-                                },
-                                onError = { error ->
-                                    errorMessage = error
-                                    showErrorDialog = true
-                                }
-                            )
-                        } else {
-                            farmerViewModel.addFarmArea(
-                                farmLocation = farmAreaLocation,
-                                riceFieldArea = sizeValue,
-                                onSuccess = {
-                                    showFarmAreaDialog = false
-                                    farmAreaLocation = ""
-                                    farmAreaSize = ""
-                                    successMessage = "Farm area added successfully!"
-                                    showSuccessDialog = true
-                                },
-                                onError = { error ->
-                                    errorMessage = error
-                                    showErrorDialog = true
-                                }
-                            )
-                        }
-                    },
-                    onDismiss = {
-                        showFarmAreaDialog = false
-                        editFarmAreaId = null
-                        farmAreaLocation = ""
-                        farmAreaSize = ""
+        // Dialogs
+        if (showFarmAreaDialog) {
+            FarmAreaDialog(
+                isEdit = editFarmAreaId != null,
+                location = farmAreaLocation,
+                onLocationChange = { farmAreaLocation = it },
+                size = farmAreaSize,
+                onSizeChange = { farmAreaSize = it },
+                isLoading = isLoading,
+                onSave = {
+                    if (farmAreaLocation.isBlank()) {
+                        errorMessage = "Farm location is required"
+                        showErrorDialog = true
+                        return@FarmAreaDialog
                     }
-                )
-            }
 
-            // Success Dialog
-            if (showSuccessDialog) {
-                AlertDialog(
-                    onDismissRequest = { showSuccessDialog = false },
-                    icon = {
-                        Icon(
-                            Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(48.dp)
-                        )
-                    },
-                    title = { Text("Success") },
-                    text = { Text(successMessage.ifEmpty { "Operation completed successfully!" }) },
-                    confirmButton = {
-                        Button(
-                            onClick = { showSuccessDialog = false }
-                        ) {
-                            Text("OK")
-                        }
+                    val sizeValue = farmAreaSize.toDoubleOrNull()
+                    if (sizeValue == null || sizeValue <= 0) {
+                        errorMessage = "Please enter a valid farm size"
+                        showErrorDialog = true
+                        return@FarmAreaDialog
                     }
-                )
-            }
 
-            // Error Dialog
-            if (showErrorDialog) {
-                AlertDialog(
-                    onDismissRequest = { showErrorDialog = false },
-                    icon = {
-                        Icon(
-                            Icons.Default.Error,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(48.dp)
-                        )
-                    },
-                    title = { Text("Error") },
-                    text = { Text(errorMessage) },
-                    confirmButton = {
-                        Button(
-                            onClick = { showErrorDialog = false }
-                        ) {
-                            Text("OK")
-                        }
-                    }
-                )
-            }
-
-            // Delete Confirmation Dialog
-            if (showDeleteDialog && farmAreaToDelete != null) {
-                AlertDialog(
-                    onDismissRequest = { showDeleteDialog = false },
-                    icon = {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(48.dp)
-                        )
-                    },
-                    title = { Text("Confirm Deletion") },
-                    text = { Text("Are you sure you want to delete this farm area? This action cannot be undone.") },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                farmerViewModel.deleteFarmArea(
-                                    farmAreaId = farmAreaToDelete!!,
-                                    onSuccess = {
-                                        showDeleteDialog = false
-                                        farmAreaToDelete = null
-                                        successMessage = "Farm area deleted successfully!"
-                                        showSuccessDialog = true
-                                    },
-                                    onError = { error ->
-                                        errorMessage = error
-                                        showErrorDialog = true
-                                    }
-                                )
+                    val currentEditId = editFarmAreaId
+                    if (currentEditId != null) {
+                        farmerViewModel.updateFarmArea(
+                            farmAreaId = currentEditId,
+                            farmLocation = farmAreaLocation,
+                            riceFieldArea = sizeValue,
+                            onSuccess = {
+                                showFarmAreaDialog = false
+                                editFarmAreaId = null
+                                farmAreaLocation = ""
+                                farmAreaSize = ""
+                                successMessage = "Farm area updated successfully!"
+                                showSuccessDialog = true
                             },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error,
-                                contentColor = MaterialTheme.colorScheme.onError
-                            )
-                        ) {
-                            Text("Delete")
-                        }
-                    },
-                    dismissButton = {
-                        OutlinedButton(
-                            onClick = {
-                                showDeleteDialog = false
-                                farmAreaToDelete = null
+                            onError = { error ->
+                                errorMessage = error
+                                showErrorDialog = true
                             }
-                        ) {
-                            Text("Cancel")
-                        }
+                        )
+                    } else {
+                        farmerViewModel.addFarmArea(
+                            farmLocation = farmAreaLocation,
+                            riceFieldArea = sizeValue,
+                            onSuccess = {
+                                showFarmAreaDialog = false
+                                farmAreaLocation = ""
+                                farmAreaSize = ""
+                                successMessage = "Farm area added successfully!"
+                                showSuccessDialog = true
+                            },
+                            onError = { error ->
+                                errorMessage = error
+                                showErrorDialog = true
+                            }
+                        )
                     }
-                )
-            }
+                },
+                onDismiss = {
+                    showFarmAreaDialog = false
+                    editFarmAreaId = null
+                    farmAreaLocation = ""
+                    farmAreaSize = ""
+                }
+            )
+        }
+
+        if (showSuccessDialog) {
+            AlertDialog(
+                onDismissRequest = { showSuccessDialog = false },
+                icon = {
+                    Icon(
+                        Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(48.dp)
+                    )
+                },
+                title = { Text("Success") },
+                text = { Text(successMessage.ifEmpty { "Operation completed successfully!" }) },
+                confirmButton = {
+                    Button(
+                        onClick = { showSuccessDialog = false }
+                    ) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+
+        if (showErrorDialog) {
+            AlertDialog(
+                onDismissRequest = { showErrorDialog = false },
+                icon = {
+                    Icon(
+                        Icons.Default.Error,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(48.dp)
+                    )
+                },
+                title = { Text("Error") },
+                text = { Text(errorMessage) },
+                confirmButton = {
+                    Button(
+                        onClick = { showErrorDialog = false }
+                    ) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+
+        if (showDeleteDialog && farmAreaToDelete != null) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                icon = {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(48.dp)
+                    )
+                },
+                title = { Text("Confirm Deletion") },
+                text = { Text("Are you sure you want to delete this farm area? This action cannot be undone.") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            farmerViewModel.deleteFarmArea(
+                                farmAreaId = farmAreaToDelete!!,
+                                onSuccess = {
+                                    showDeleteDialog = false
+                                    farmAreaToDelete = null
+                                    successMessage = "Farm area deleted successfully!"
+                                    showSuccessDialog = true
+                                },
+                                onError = { error ->
+                                    errorMessage = error
+                                    showErrorDialog = true
+                                }
+                            )
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        )
+                    ) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(
+                        onClick = {
+                            showDeleteDialog = false
+                            farmAreaToDelete = null
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 }
@@ -1371,7 +1419,6 @@ private fun FallbackProfileView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
         Card(

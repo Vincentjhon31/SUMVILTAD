@@ -20,7 +20,7 @@ object ApiClient {
     // Examples:
     // private const val BASE_URL = "https://yourdomain.hostingerapp.com/"
     // private const val BASE_URL = "https://your-custom-domain.com/"
-    private const val BASE_URL = "https://fieldconnect.site/"
+    private const val BASE_URL = "https://sumviltadconnect.site/"
 
     // Fallback for local testing
     private const val LOCAL_URL = "http://10.0.2.2:8000/"

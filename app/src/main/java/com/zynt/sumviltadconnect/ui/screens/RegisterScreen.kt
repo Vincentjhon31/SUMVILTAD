@@ -88,6 +88,65 @@ fun RegisterScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var isEmailValid by remember { mutableStateOf(false) }
+
+    // Email validation function matching Laravel backend logic
+    fun validateEmail(emailInput: String): Pair<Boolean, String?> {
+        if (emailInput.isBlank()) return Pair(false, null)
+        
+        // Basic format check
+        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
+        if (!emailRegex.matches(emailInput)) {
+            return Pair(false, "Invalid email format")
+        }
+        
+        val parts = emailInput.split("@")
+        if (parts.size != 2) return Pair(false, "Invalid email format")
+        
+        val username = parts[0]
+        val domain = parts[1].lowercase()
+        
+        // Major email provider validation (matching Laravel)
+        val majorProviders = listOf("gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com")
+        if (domain in majorProviders) {
+            // Stricter validation for major providers
+            if (username.length < 3) {
+                return Pair(false, "Username too short for $domain")
+            }
+            // Check for all numeric
+            if (username.all { it.isDigit() }) {
+                return Pair(false, "Please use a real email address")
+            }
+            // Check for suspicious patterns
+            val suspiciousPatterns = listOf(
+                "^[a-z]{1,3}$".toRegex(),
+                "^test\\d*$".toRegex(RegexOption.IGNORE_CASE),
+                "^user\\d*$".toRegex(RegexOption.IGNORE_CASE),
+                "^admin\\d*$".toRegex(RegexOption.IGNORE_CASE),
+                "^fake\\d*$".toRegex(RegexOption.IGNORE_CASE),
+                "^temp\\d*$".toRegex(RegexOption.IGNORE_CASE)
+            )
+            if (suspiciousPatterns.any { it.matches(username) }) {
+                return Pair(false, "Please use a real email address")
+            }
+        }
+        
+        return Pair(true, null)
+    }
+    
+    // Real-time email validation
+    LaunchedEffect(email) {
+        if (email.length >= 3) {
+            kotlinx.coroutines.delay(500) // Debounce
+            val (valid, error) = validateEmail(email)
+            isEmailValid = valid
+            emailError = error
+        } else {
+            isEmailValid = false
+            emailError = null
+        }
+    }
 
     val isLoading by authViewModel.isLoading.collectAsState()
     val errorMessage by authViewModel.errorMessage.collectAsState()
@@ -210,7 +269,7 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Email TextField
+                    // Email TextField with real-time validation
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
@@ -218,13 +277,34 @@ fun RegisterScreen(
                         leadingIcon = {
                             Icon(Icons.Default.Email, contentDescription = "Email", tint = MaterialTheme.colorScheme.primary)
                         },
+                        trailingIcon = {
+                            when {
+                                email.length >= 3 && isEmailValid -> Icon(
+                                    Icons.Default.CheckCircle,
+                                    contentDescription = "Valid",
+                                    tint = Color(0xFF4CAF50)
+                                )
+                                email.length >= 3 && !isEmailValid -> Icon(
+                                    Icons.Default.Error,
+                                    contentDescription = "Invalid",
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        isError = emailError != null,
+                        supportingText = if (emailError != null) {
+                            { Text(emailError!!, color = MaterialTheme.colorScheme.error, fontSize = 12.sp) }
+                        } else if (isEmailValid) {
+                            { Text("Email is valid ✓", color = Color(0xFF4CAF50), fontSize = 12.sp) }
+                        } else null,
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            focusedLabelColor = MaterialTheme.colorScheme.primary
+                            focusedBorderColor = if (isEmailValid && email.isNotEmpty()) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            errorBorderColor = MaterialTheme.colorScheme.error
                         )
                     )
 

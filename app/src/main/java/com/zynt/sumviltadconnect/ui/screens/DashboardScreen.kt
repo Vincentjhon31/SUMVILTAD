@@ -1,5 +1,6 @@
 package com.zynt.sumviltadconnect.ui.screens
 
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -140,7 +141,13 @@ fun DashboardScreen(
                 EnhancedDashboardContent(
                     data = successState.data,
                     isVisible = isVisible,
-                    onNavigate = { route: String -> navController.navigate(route) }
+                    onNavigate = { route: String -> 
+                        try {
+                            navController.navigate(route)
+                        } catch (e: Exception) {
+                            Log.e("DashboardScreen", "Navigation error to $route", e)
+                        }
+                    }
                 )
             }
         }
@@ -284,12 +291,7 @@ private fun EnhancedDashboardContent(
             modifier = Modifier.padding(bottom = AppDimensions.paddingMedium())
         )
 
-        OverviewQuickStatsRow(
-            pendingTasks = data.pendingTasks,
-            upcomingEvents = data.upcomingEvents
-        )
-
-        Spacer(modifier = Modifier.height(AppDimensions.paddingLarge()))
+        Spacer(modifier = Modifier.height(AppDimensions.paddingMedium()))
 
         // First Row - Staggered Animation
         AnimatedVisibility(
@@ -347,7 +349,7 @@ private fun EnhancedDashboardContent(
                     color = Color(0xFFFF9800),
                     supportingText = "Awaiting expert check",
                     modifier = Modifier.weight(1f),
-                    onClick = {},
+                    onClick = { onNavigate("cropHealth") },
                     animationDelay = 200
                 )
                 EnhancedStatCard(
@@ -359,7 +361,7 @@ private fun EnhancedDashboardContent(
                     valueSuffix = "%",
                     progressFraction = data.taskProgress.coerceIn(0, 100) / 100f,
                     modifier = Modifier.weight(1f),
-                    onClick = {},
+                    onClick = { onNavigate("tasks") },
                     animationDelay = 300
                 )
             }
@@ -419,17 +421,19 @@ private data class QuickStat(
     val icon: ImageVector,
     val value: Int,
     val label: String,
-    val accent: Color
+    val accent: Color,
+    val route: String
 )
 
 @Composable
 private fun OverviewQuickStatsRow(
     pendingTasks: Int,
-    upcomingEvents: Int
+    upcomingEvents: Int,
+    onNavigate: (String) -> Unit
 ) {
     val quickStats = listOf(
-        QuickStat(Icons.Default.EventAvailable, upcomingEvents, "Upcoming events", Color(0xFF2E7D32)),
-        QuickStat(Icons.Default.TaskAlt, pendingTasks, "Pending tasks", Color(0xFFEF6C00))
+        QuickStat(Icons.Default.EventAvailable, upcomingEvents, "Upcoming events", Color(0xFF2E7D32), "events"),
+        QuickStat(Icons.Default.TaskAlt, pendingTasks, "Pending tasks", Color(0xFFEF6C00), "tasks")
     )
 
     val scrollState = rememberScrollState()
@@ -445,7 +449,8 @@ private fun OverviewQuickStatsRow(
                 icon = stat.icon,
                 value = stat.value,
                 label = stat.label,
-                accent = stat.accent
+                accent = stat.accent,
+                onClick = { onNavigate(stat.route) }
             )
         }
     }
@@ -456,12 +461,14 @@ private fun OverviewQuickStatChip(
     icon: ImageVector,
     value: Int,
     label: String,
-    accent: Color
+    accent: Color,
+    onClick: () -> Unit
 ) {
     Surface(
         border = BorderStroke(1.dp, accent.copy(alpha = 0.3f)),
         shape = RoundedCornerShape(32.dp),
-        color = accent.copy(alpha = 0.08f)
+        color = accent.copy(alpha = 0.08f),
+        modifier = Modifier.clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier

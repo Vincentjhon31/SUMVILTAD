@@ -222,6 +222,24 @@ fun ProfileScreen(
                     )
 
                     EnhancedProfileMenuItem(
+                        icon = Icons.Default.Language,
+                        title = "Visit Website",
+                        subtitle = "sumviltadconnect.site",
+                        onClick = {
+                            val intent = android.content.Intent(
+                                android.content.Intent.ACTION_VIEW,
+                                android.net.Uri.parse("https://sumviltadconnect.site")
+                            )
+                            context.startActivity(intent)
+                        }
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = AppDimensions.paddingMedium()),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
+
+                    EnhancedProfileMenuItem(
                         icon = Icons.Default.SystemUpdate,
                         title = "Check for Updates",
                         subtitle = if (updateState is UpdateState.Checking) 

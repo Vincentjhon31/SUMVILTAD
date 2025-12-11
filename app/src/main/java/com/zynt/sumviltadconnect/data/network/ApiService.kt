@@ -129,6 +129,10 @@ interface ApiService {
     @POST("api/crop-health/{id}/comments")
     suspend fun addCropHealthComment(@Path("id") id: Int, @Body request: CommentRequest): Response<CommentResponse>
 
+    // Email verification via link
+    @GET
+    suspend fun verifyEmailViaLink(@Url url: String): Response<AuthResponse>
+
     // Test endpoint to verify API connectivity
     @GET("api/ping")
     suspend fun ping(): Response<PingResponse>

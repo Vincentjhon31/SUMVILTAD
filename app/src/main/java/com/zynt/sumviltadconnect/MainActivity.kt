@@ -34,6 +34,9 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
+    private var authViewModel: AuthViewModel? = null
+    private var shouldCheckVerification = false
+
     // Declare the launcher at the top of your Activity/Fragment:
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -68,9 +71,176 @@ class MainActivity : ComponentActivity() {
             sendStoredFcmTokenToServer()
         }
 
+        // Handle deep links (email verification)
+        handleEmailVerificationDeepLink(intent)
+
         setContent {
             SumviltadConnectTheme {
-                SumviltadConnectApp(initialLoginState = isLoggedInFromSplash)
+                SumviltadConnectApp(
+                    initialLoginState = isLoggedInFromSplash,
+                    onAuthViewModelReady = { viewModel ->
+                        authViewModel = viewModel
+                        // Check if we need to auto-login after verification
+                        if (shouldCheckVerification) {
+                            checkPendingVerification()
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Check for pending verification when app resumes
+        if (authViewModel != null) {
+            checkPendingVerification()
+        } else {
+            shouldCheckVerification = true
+        }
+    }
+
+    private fun checkPendingVerification() {
+        val prefs = getSharedPreferences("sumviltad_prefs", MODE_PRIVATE)
+        val token = prefs.getString("auth_token", null)
+        val isAlreadyLoggedIn = authViewModel?.isLoggedIn?.value ?: false
+        
+        if (token != null && !isAlreadyLoggedIn) {
+            Log.d(TAG, "Found pending verification token, attempting auto-login")
+            authViewModel?.autoLoginWithToken(this, token) {
+                // Clear the token from temporary storage after successful login
+                prefs.edit().remove("auth_token").apply()
+                Log.d(TAG, "Auto-login successful after verification")
+            }
+            shouldCheckVerification = false
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleEmailVerificationDeepLink(intent)
+    }
+
+    private fun handleEmailVerificationDeepLink(intent: android.content.Intent?) {
+        val data = intent?.data
+        if (data != null) {
+            Log.d(TAG, "Deep link received: $data")
+            
+            // Check if this is a verified callback with token
+            if (data.scheme == "sumviltad" && data.host == "verified") {
+                val token = data.getQueryParameter("token")
+                if (token != null) {
+                    handleVerifiedCallback(token)
+                } else {
+                    Log.e(TAG, "No token in verified callback")
+                }
+            }
+            // Check if this is an email verification link
+            else if (data.scheme == "sumviltad" && data.host == "verify-email") {
+                // Extract verification URL from deep link
+                val verificationUrl = data.getQueryParameter("url")
+                if (verificationUrl != null) {
+                    verifyEmailWithLink(verificationUrl)
+                } else {
+                    Log.e(TAG, "No verification URL in deep link")
+                }
+            } else if (data.scheme == "https" && data.host == "sumviltadconnect.site" && 
+                       data.path?.startsWith("/api/email/verify") == true) {
+                // Direct HTTPS link - use the full URL
+                verifyEmailWithLink(data.toString())
+            }
+        }
+    }
+
+    private fun verifyEmailWithLink(url: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Log.d(TAG, "Verifying email with link: $url")
+                
+                // Make API call to verification endpoint
+                val response = ApiClient.apiService.verifyEmailViaLink(url)
+                
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body?.success == true) {
+                        Log.d(TAG, "✅ Email verified successfully")
+                        
+                        // Save auth token if provided
+                        body.token?.let { token ->
+                            val prefs = getSharedPreferences("sumviltad_prefs", MODE_PRIVATE)
+                            prefs.edit().putString("auth_token", token).apply()
+                            Log.d(TAG, "Auth token saved")
+                        }
+                        
+                        // Show success message on main thread
+                        runOnUiThread {
+                            android.widget.Toast.makeText(
+                                this@MainActivity,
+                                "Email verified! You can now log in.",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        Log.e(TAG, "❌ Email verification failed: ${body?.message}")
+                        runOnUiThread {
+                            android.widget.Toast.makeText(
+                                this@MainActivity,
+                                body?.message ?: "Verification failed",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                } else {
+                    Log.e(TAG, "❌ Email verification request failed: ${response.code()}")
+                    runOnUiThread {
+                        android.widget.Toast.makeText(
+                            this@MainActivity,
+                            "Verification failed. Please try again.",
+                            android.widget.Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Error verifying email", e)
+                runOnUiThread {
+                    android.widget.Toast.makeText(
+                        this@MainActivity,
+                        "Network error. Please try again.",
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    private fun handleVerifiedCallback(token: String) {
+        Log.d(TAG, "✅ Received verification callback with token")
+        
+        // Save auth token temporarily
+        val prefs = getSharedPreferences("sumviltad_prefs", MODE_PRIVATE)
+        prefs.edit().putString("auth_token", token).apply()
+        Log.d(TAG, "Auth token saved from verification callback")
+        
+        // Show success message
+        runOnUiThread {
+            android.widget.Toast.makeText(
+                this@MainActivity,
+                "Email verified! Logging you in...",
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+            
+            // Auto-login with the verified token
+            if (authViewModel != null) {
+                authViewModel?.autoLoginWithToken(this, token) {
+                    // Clear the token from temporary storage after successful login
+                    prefs.edit().remove("auth_token").apply()
+                    Log.d(TAG, "Auto-login successful, navigating to home")
+                }
+            } else {
+                // ViewModel not ready yet, will check in onResume
+                shouldCheckVerification = true
+                Log.d(TAG, "AuthViewModel not ready, will check on resume")
             }
         }
     }
@@ -169,12 +339,20 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SumviltadConnectApp(initialLoginState: Boolean = false) {
+fun SumviltadConnectApp(
+    initialLoginState: Boolean = false,
+    onAuthViewModelReady: (AuthViewModel) -> Unit = {}
+) {
     val navController = rememberAnimatedNavController()
     val authViewModel: AuthViewModel = viewModel()
 
     // Check login status
     val context = androidx.compose.ui.platform.LocalContext.current
+
+    // Notify MainActivity that AuthViewModel is ready
+    LaunchedEffect(authViewModel) {
+        onAuthViewModelReady(authViewModel)
+    }
 
     // Set the initial auth state immediately to prevent flicker
     LaunchedEffect(initialLoginState) {
@@ -188,6 +366,16 @@ fun SumviltadConnectApp(initialLoginState: Boolean = false) {
     }
 
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState(initial = initialLoginState)
+
+    // Observe login state changes and navigate to home when user logs in
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn && navController.currentBackStackEntry?.destination?.route != "home") {
+            navController.navigate("home") {
+                // Clear the back stack so user can't go back to login/register
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     // Use the initial login state for immediate routing to prevent showing register screen
     val startDestination = if (initialLoginState) "home" else "login"

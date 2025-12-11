@@ -42,9 +42,41 @@
         <!-- Main Activity (no longer launcher) -->
         <activity
             android:name=".MainActivity"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.SumviltadConnect">
+            android:theme="@style/Theme.SumviltadConnect"
+            android:launchMode="singleTask">
+            
+            <!-- Deep link for email verification -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="sumviltad"
+                    android:host="verify-email" />
+            </intent-filter>
+
+            <!-- Deep link for verified callback -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="sumviltad"
+                    android:host="verified" />
+            </intent-filter>
+
+            <!-- HTTPS deep link fallback -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="sumviltadconnect.site"
+                    android:pathPrefix="/api/email/verify" />
+            </intent-filter>
         </activity>
 
         <!-- File provider for camera functionality -->

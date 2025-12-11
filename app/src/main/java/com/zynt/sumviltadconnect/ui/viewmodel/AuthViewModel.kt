@@ -375,4 +375,85 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+
+    /**
+     * Auto-login with token after email verification
+     * This method handles the complete login flow when the user verifies their email
+     */
+    fun autoLoginWithToken(context: Context, token: String, onSuccess: () -> Unit) {
+        _isLoading.value = true
+        _syncStatus.value = "Verifying and logging in..."
+        
+        Log.d(TAG, "Auto-login with verification token")
+        
+        viewModelScope.launch {
+            try {
+                // Save the token immediately
+                ApiClient.saveAuthToken(token)
+                TokenManager.saveToken(context, token)
+                
+                // Fetch user data using the token
+                val response = ApiClient.apiService.getUser()
+                
+                if (response.isSuccessful) {
+                    response.body()?.user?.let { user ->
+                        // Save user information
+                        TokenManager.saveUserInfo(context, user.name, user.email, user.id)
+                        _isLoggedIn.value = true
+                        
+                        Log.d(TAG, "✅ Auto-login successful for user: ${user.email}")
+                        
+                        // Send FCM token to server
+                        sendFcmTokenToServer(context)
+                        
+                        // Initialize data synchronization
+                        _syncStatus.value = "Synchronizing your data..."
+                        initializeDataSync(context)
+                        
+                        // Perform initial data sync
+                        launch {
+                            dataSynchronizer?.let { sync ->
+                                val syncResult = sync.performInitialSync()
+                                when (syncResult) {
+                                    is DataSynchronizer.SyncResult.Success -> {
+                                        _syncStatus.value = "✓ All data synchronized"
+                                        Log.d(TAG, "Data sync completed: ${syncResult.message}")
+                                    }
+                                    is DataSynchronizer.SyncResult.PartialSuccess -> {
+                                        _syncStatus.value = "⚠ Most data synchronized"
+                                        Log.w(TAG, "Partial data sync: ${syncResult.message}")
+                                    }
+                                    is DataSynchronizer.SyncResult.Error -> {
+                                        _syncStatus.value = null
+                                        Log.e(TAG, "Data sync failed: ${syncResult.message}")
+                                    }
+                                }
+                                
+                                kotlinx.coroutines.delay(2000)
+                                _syncStatus.value = null
+                            }
+                        }
+                        
+                        _isLoading.value = false
+                        onSuccess()
+                    } ?: run {
+                        _errorMessage.value = "Failed to get user information"
+                        _isLoading.value = false
+                        _syncStatus.value = null
+                        Log.e(TAG, "No user data in response")
+                    }
+                } else {
+                    _errorMessage.value = "Verification failed. Please try logging in manually."
+                    _isLoading.value = false
+                    _syncStatus.value = null
+                    Log.e(TAG, "Auto-login failed with code: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Network error: ${e.message}"
+                _isLoading.value = false
+                _syncStatus.value = null
+                Log.e(TAG, "Auto-login error", e)
+            }
+        }
+    }
 }

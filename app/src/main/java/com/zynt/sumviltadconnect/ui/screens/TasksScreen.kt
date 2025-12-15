@@ -77,7 +77,7 @@ fun TasksScreen(vm: TasksViewModel = viewModel()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
-                        top = padding.calculateTopPadding() + AppDimensions.paddingMedium(),
+                        top = padding.calculateTopPadding() + AppDimensions.paddingSmall(),
                         bottom = padding.calculateBottomPadding() + AppDimensions.paddingMedium(),
                         start = AppDimensions.paddingMedium(),
                         end = AppDimensions.paddingMedium()
@@ -146,8 +146,8 @@ private fun EnhancedTasksHeader(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(AppDimensions.paddingLarge()),
-        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.cardElevation())
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingSmall()),
+        shape = RoundedCornerShape(AppDimensions.paddingLarge())
     ) {
         Box(
             modifier = Modifier

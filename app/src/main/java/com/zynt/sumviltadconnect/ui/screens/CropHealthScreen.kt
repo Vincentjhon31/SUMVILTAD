@@ -115,22 +115,6 @@ fun CropHealthScreen(
                 }
             }
         }
-
-        // Floating Action Button
-        FloatingActionButton(
-            onClick = onNewDetection,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(AppDimensions.paddingLarge()),
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            elevation = FloatingActionButtonDefaults.elevation(defaultElevation = AppDimensions.paddingSmall())
-        ) {
-            Icon(
-                Icons.Default.AddAPhoto,
-                contentDescription = "New Detection"
-            )
-        }
     }
 
     // Delete confirmation dialog

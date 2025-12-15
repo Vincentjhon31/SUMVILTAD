@@ -535,7 +535,7 @@ fun ProfileScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                "To revolutionize rice farming in the Philippines by making advanced disease detection technology accessible to every farmer.",
+                                "To revolutionize rice farming in the Sumviltad Comminity by making advanced disease detection technology accessible to every farmer.",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -562,8 +562,7 @@ fun ProfileScreen(
                             Spacer(modifier = Modifier.height(12.dp))
                             
                             GoalItem("Provide 95%+ accurate disease detection")
-                            GoalItem("Reach 10,000+ farmers nationwide")
-                            GoalItem("Reduce crop losses by 50%")
+                            GoalItem("Reach 400+ Sumviltad farmers")
                             GoalItem("Build a thriving farming community")
                         }
                     }

@@ -161,7 +161,7 @@ private fun EnhancedHeader(userName: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = AppDimensions.paddingMedium()),
+            .padding(horizontal = AppDimensions.paddingMedium(), vertical = AppDimensions.paddingSmall()),
         elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingSmall()),
         shape = RoundedCornerShape(AppDimensions.paddingLarge())
     ) {

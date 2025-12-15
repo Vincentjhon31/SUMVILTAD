@@ -266,8 +266,9 @@ fun SplashScreen(onTimeout: () -> Unit) {
                 .alpha(alpha * 0.8f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Powered By AI Removed
             Text(
-                text = "Powered by AI",
+                text = "",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -384,12 +384,13 @@ private fun EnhancedIrrigationHeader() {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = AppDimensions.paddingMedium()),
+            .padding(horizontal = AppDimensions.paddingMedium(), vertical = AppDimensions.paddingSmall()),
         elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.paddingSmall()),
         shape = RoundedCornerShape(AppDimensions.paddingLarge())
     ) {
         Box(
             modifier = Modifier
+                .fillMaxWidth()
                 .background(
                     Brush.horizontalGradient(
                         colors = listOf(
